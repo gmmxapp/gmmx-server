@@ -54,4 +54,11 @@ public class AuthController {
         authService.verifyOtp(request);
         return ApiResponse.success(null, "OTP verified successfully");
     }
+
+    @GetMapping("/check-email")
+    @Operation(summary = "Check Email Availability", description = "Checks if the email is already registered in the system.")
+    public ApiResponse<Boolean> checkEmail(@RequestParam String email) {
+        boolean exists = authService.emailExists(email);
+        return ApiResponse.success(!exists, exists ? "Email already exists" : "Email available");
+    }
 }

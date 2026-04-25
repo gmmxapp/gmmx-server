@@ -13,9 +13,12 @@ public class AuthDtos {
     @Data
     public static class LoginRequest {
         @NotBlank
+        private String gymId;
+        @NotBlank
         private String identifier; // email or phone
         @NotBlank
-        private String otp;
+        private String pin;
+        private String deviceId;
     }
 
     @Data
@@ -50,8 +53,8 @@ public class AuthDtos {
         private String email;
         @NotBlank
         private String phone;
-        @NotBlank @Size(min = 8)
-        private String password;
+        @NotBlank @Size(min = 4, max = 4)
+        private String pin;
     }
 
     @Data
@@ -66,6 +69,7 @@ public class AuthDtos {
         private UUID id;
         private String email;
         private String fullName;
+        private String mobile;
         private UserRole role;
         private UUID tenantId;
     }

@@ -46,17 +46,18 @@ public class AuthService {
         // 1. Create Tenant
         Tenant tenant = new Tenant();
         tenant.setName(request.getGymName());
-        tenant.setSubdomain(request.getSubdomain());
+        tenant.setSubdomain(request.getSubdomain().toLowerCase().replaceAll("[^a-z0-9]", ""));
+        tenant.setDisplayName(request.getGymName());
         tenant.setPlan(SubscriptionPlan.FREE);
         tenant = tenantRepository.save(tenant);
 
         // 2. Create Owner User
         UserAccount owner = new UserAccount();
-        owner.setTenantId(tenant.getId()); // Manual injection for root setup
+        owner.setTenantId(tenant.getId()); 
         owner.setEmail(request.getEmail());
         owner.setMobile(request.getPhone());
         owner.setFullName(request.getOwnerName());
-        owner.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        owner.setPasswordHash(passwordEncoder.encode(request.getPin()));
         owner.setRole(UserRole.OWNER);
         owner = userAccountRepository.save(owner);
 
@@ -75,26 +76,51 @@ public class AuthService {
     }
 
     public AuthDtos.AuthResponse login(AuthDtos.LoginRequest request) {
-        System.out.println("Login attempt for identifier: [" + request.getIdentifier() + "] with OTP: [" + request.getOtp() + "]");
-        
-        if (!otpService.verifyOtp(request.getIdentifier(), request.getOtp())) {
-            System.out.println("OTP verification failed for identifier: " + request.getIdentifier());
-            throw new RuntimeException("Invalid or expired OTP for identifier: " + request.getIdentifier());
-        }
-        
+        // 1. Resolve Tenant
+        Tenant tenant = tenantRepository.findBySubdomain(request.getGymId())
+                .orElseThrow(() -> new RuntimeException("Gym not found: " + request.getGymId()));
+
+        // 2. Find User within Tenant
         String identifier = request.getIdentifier().trim();
-        System.out.println("Identifier: [" + identifier + "], length: " + identifier.length());
-        for (int i = 0; i < identifier.length(); i++) {
-            System.out.println("Char at " + i + ": " + (int)identifier.charAt(i));
+        UserAccount user = userAccountRepository.findByEmailOrMobileAndTenantId(identifier, identifier, tenant.getId())
+                .orElseThrow(() -> new RuntimeException("User not found in this gym."));
+
+        // 3. Brute force check
+        if (user.isAccountLocked()) {
+            throw new RuntimeException("Account is locked due to too many failed attempts. Contact owner.");
         }
-        UserAccount user = userAccountRepository.findByEmailOrMobile(identifier, identifier)
-                .orElseThrow(() -> {
-                    System.out.println("User not found in DB for identifier: [" + identifier + "]");
-                    return new RuntimeException("User not found in database for: " + identifier);
-                });
+
+        // 4. Verify PIN
+        if (!passwordEncoder.matches(request.getPin(), user.getPasswordHash())) {
+            handleFailedLogin(user);
+            throw new RuntimeException("Invalid PIN.");
+        }
+
+        // 5. Device Binding Check
+        if (user.getDeviceId() != null && !user.getDeviceId().equals(request.getDeviceId())) {
+            System.out.println("Security: Device mismatch for user " + user.getEmail() + ". Attempted from: " + request.getDeviceId());
+            // Optionally: throw new RuntimeException("New device detected. Verification required.");
+        }
         
-        System.out.println("User found! ID: " + user.getId() + ", Email: " + user.getEmail() + ", Mobile: " + user.getMobile());
+        // Update device ID if first time
+        if (user.getDeviceId() == null && request.getDeviceId() != null) {
+            user.setDeviceId(request.getDeviceId());
+        }
+
+        // Reset failed attempts
+        user.setFailedLoginAttempts(0);
+        userAccountRepository.save(user);
+
         return authenticateAndGenerateTokens(user, user.getTenantId());
+    }
+
+    private void handleFailedLogin(UserAccount user) {
+        int attempts = user.getFailedLoginAttempts() + 1;
+        user.setFailedLoginAttempts(attempts);
+        if (attempts >= 5) {
+            user.setAccountLocked(true);
+        }
+        userAccountRepository.save(user);
     }
 
     public AuthDtos.AuthResponse googleLogin(AuthDtos.GoogleLoginRequest request) {
@@ -139,5 +165,9 @@ public class AuthService {
         response.setRefreshToken(refreshToken.getToken());
         response.setUser(userMapper.toResponse(user));
         return response;
+    }
+
+    public boolean emailExists(String email) {
+        return userAccountRepository.existsByEmail(email);
     }
 }

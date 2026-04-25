@@ -46,6 +46,8 @@ public class UserAccount extends BaseEntity implements UserDetails {
 
     private boolean accountLocked = false;
 
+    private String deviceId;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));

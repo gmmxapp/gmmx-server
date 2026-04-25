@@ -31,6 +31,11 @@ public class Tenant {
     @Column(nullable = false, unique = true)
     private String subdomain;
 
+    private String displayName;
+    private String logoUrl;
+    private String address;
+    private String contactPhone;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private SubscriptionPlan plan = SubscriptionPlan.FREE;
