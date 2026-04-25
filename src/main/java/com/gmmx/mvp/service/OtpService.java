@@ -23,8 +23,9 @@ public class OtpService {
         log.info("Generated OTP {} for identifier {}", otp, identifier);
 
         if (identifier.contains("@")) {
-            String subject = "GMMX - Your Verification Code";
-            String body = "Your verification code is: " + otp + "\n\nThis code will expire in 10 minutes.";
+            String subject = "Gmmx- Your Verification Code";
+            String body = "Thanks for choosing Gmmx. \n\nYour verification code is: " + "<b>" + otp + "</b>"
+                    + "\n\nThis code will expire in 10 minutes.";
             emailService.sendEmail(identifier, subject, body);
         } else {
             // Integration with SMS service goes here
@@ -34,7 +35,7 @@ public class OtpService {
 
     public boolean verifyOtp(String identifier, String otp) {
         String storedOtp = otpStore.get(identifier);
-        
+
         if (storedOtp != null && storedOtp.equals(otp)) {
             otpStore.remove(identifier);
             return true;
