@@ -1,0 +1,24 @@
+spring:
+  profiles:
+    active: dev
+  application:
+    name: gmmx-backend
+  
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+        filter:
+          tenantFilter:
+            condition: tenant_id = :tenantId
+  
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
