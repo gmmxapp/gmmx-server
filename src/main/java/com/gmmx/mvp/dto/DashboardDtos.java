@@ -2,7 +2,6 @@ package com.gmmx.mvp.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import java.util.List;
 
 public class DashboardDtos {
 
