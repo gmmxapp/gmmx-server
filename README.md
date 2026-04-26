@@ -4,7 +4,7 @@ The robust Spring Boot backend for the GMMX SaaS platform. It handles multi-tena
 
 ## 🚀 Tech Stack
 - **Framework**: Spring Boot 3.x
-- **Language**: Java 17
+- **Language**: Java 21
 - **Security**: Spring Security + JWT (JSON Web Tokens)
 - **Database**: PostgreSQL
 - **Migration**: Flyway
@@ -64,7 +64,7 @@ The API uses **Bearer Authentication**. Include the JWT token in the `Authorizat
 ## 🛠️ Development Setup
 
 1. **Clone the repository**
-2. **Configure Environment**: Create a `.env` file or use `application-dev.yml`.
+2. **Configure Environment**: Copy `.env` values from placeholders and set real secrets through environment variables.
 3. **Database**: Ensure a PostgreSQL instance is running.
 4. **Run Application**:
    ```bash

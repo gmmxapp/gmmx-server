@@ -39,8 +39,7 @@ public class MemberService {
         user.setFullName(request.getFullName());
         user.setMobile(request.getMobile());
         user.setRole(UserRole.MEMBER);
-        // Default password for members could be their email or something else, here we just set a dummy
-        user.setPasswordHash(passwordEncoder.encode("changeMe123!")); 
+        user.setPasswordHash(passwordEncoder.encode(generateTemporaryPassword()));
         user = userAccountRepository.save(user);
 
         // 2. Create MemberProfile
@@ -99,5 +98,9 @@ public class MemberService {
         UserAccount user = profile.getUser();
         memberProfileRepository.delete(profile);
         userAccountRepository.delete(user);
+    }
+
+    private String generateTemporaryPassword() {
+        return UUID.randomUUID().toString() + UUID.randomUUID();
     }
 }

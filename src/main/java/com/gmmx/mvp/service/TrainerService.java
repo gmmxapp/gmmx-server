@@ -31,7 +31,7 @@ public class TrainerService {
         trainer.setEmail(request.getEmail());
         trainer.setMobile(request.getMobile());
         trainer.setRole(UserRole.TRAINER);
-        trainer.setPasswordHash(passwordEncoder.encode("trainer123!"));
+        trainer.setPasswordHash(passwordEncoder.encode(generateTemporaryPassword()));
         
         trainer = userAccountRepository.save(trainer);
         return mapToResponse(trainer);
@@ -74,5 +74,9 @@ public class TrainerService {
         response.setMobile(account.getMobile());
         response.setActive(account.isEnabled());
         return response;
+    }
+
+    private String generateTemporaryPassword() {
+        return UUID.randomUUID().toString() + UUID.randomUUID();
     }
 }

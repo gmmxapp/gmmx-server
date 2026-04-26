@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -12,15 +13,18 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class OtpService {
 
-    // Simple in-memory store for MVP. For production, use Redis or a DB table.
+    private static final long OTP_EXPIRY_MS = 10 * 60 * 1000;
+    private static final int MAX_ATTEMPTS = 5;
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+
     private final EmailService emailService;
-    private final Map<String, String> otpStore = new ConcurrentHashMap<>();
+    private final Map<String, OtpRecord> otpStore = new ConcurrentHashMap<>();
 
     public void generateAndSendOtp(String identifier) {
-        // Generate a random 6-digit OTP
-        String otp = String.valueOf((int) ((Math.random() * (999999 - 100000)) + 100000));
-        otpStore.put(identifier, otp);
-        log.info("Generated OTP {} for identifier {}", otp, identifier);
+        int rawOtp = 100000 + SECURE_RANDOM.nextInt(900000);
+        String otp = String.valueOf(rawOtp);
+        otpStore.put(identifier, new OtpRecord(otp, System.currentTimeMillis() + OTP_EXPIRY_MS, 0));
+        log.info("Generated OTP for identifier {}", identifier);
 
         if (identifier.contains("@")) {
             String subject = "Gmmx- Your Verification Code";
@@ -29,17 +33,39 @@ public class OtpService {
             emailService.sendEmail(identifier, subject, body);
         } else {
             // Integration with SMS service goes here
-            log.info("SMS integration not implemented. OTP for mobile {}: {}", identifier, otp);
+            log.info("SMS integration not implemented for mobile {}", identifier);
         }
     }
 
     public boolean verifyOtp(String identifier, String otp) {
-        String storedOtp = otpStore.get(identifier);
+        OtpRecord storedOtp = otpStore.get(identifier);
 
-        if (storedOtp != null && storedOtp.equals(otp)) {
+        if (storedOtp == null) {
+            return false;
+        }
+
+        if (storedOtp.expiresAt() < System.currentTimeMillis()) {
+            otpStore.remove(identifier);
+            return false;
+        }
+
+        if (storedOtp.attempts() >= MAX_ATTEMPTS) {
+            otpStore.remove(identifier);
+            return false;
+        }
+
+        if (storedOtp.code().equals(otp)) {
             otpStore.remove(identifier);
             return true;
         }
+
+        otpStore.put(identifier, storedOtp.withAttempts(storedOtp.attempts() + 1));
         return false;
+    }
+
+    private record OtpRecord(String code, long expiresAt, int attempts) {
+        private OtpRecord withAttempts(int newAttempts) {
+            return new OtpRecord(this.code, this.expiresAt, newAttempts);
+        }
     }
 }
