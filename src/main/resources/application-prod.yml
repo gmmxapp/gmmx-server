@@ -14,6 +14,7 @@ spring:
 
   flyway:
     enabled: true
+    repair-on-migrate: true
     url: ${SPRING_DATASOURCE_URL}
     user: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
