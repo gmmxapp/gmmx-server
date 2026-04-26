@@ -12,7 +12,7 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
     
-    @org.springframework.scheduling.annotation.Async
+    // Using sync method now to prevent silent failures in production.
     public void sendEmail(String to, String subject, String body) {
         try {
             jakarta.mail.internet.MimeMessage mimeMessage = mailSender.createMimeMessage();
@@ -26,8 +26,8 @@ public class EmailService {
             mailSender.send(mimeMessage);
             log.info("HTML Email sent successfully to {}", to);
         } catch (Exception e) {
-            log.error("Failed to send HTML email to {}", to, e);
-            throw new RuntimeException("Email sending failed");
+            log.error("Failed to send HTML email to {}, Cause: {}", to, e.getMessage(), e);
+            throw new RuntimeException("Email sending failed: " + e.getMessage());
         }
     }
 }
