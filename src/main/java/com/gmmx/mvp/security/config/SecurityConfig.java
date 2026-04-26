@@ -61,12 +61,11 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of(
-            "http://localhost:3000",
-            "http://localhost:5173",
-            "https://gmmx.app",
-            "https://www.gmmx.app",
-            "https://admin.gmmx.app"
+        configuration.setAllowedOriginPatterns(List.of(
+            "http://localhost:[*]",
+            "http://127.0.0.1:[*]",
+            "https://*.gmmx.app",
+            "https://gmmx.app"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
