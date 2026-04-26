@@ -22,6 +22,7 @@ public interface UserAccountRepository extends JpaRepository<UserAccount, UUID> 
     org.springframework.data.domain.Page<UserAccount> findByRole(com.gmmx.mvp.entity.UserRole role, org.springframework.data.domain.Pageable pageable);
     
     long countByTenantId(UUID tenantId);
+    java.util.List<UserAccount> findAllByTenantId(UUID tenantId);
     
     java.util.Optional<UserAccount> findByTenantIdAndRole(UUID tenantId, com.gmmx.mvp.entity.UserRole role);
     

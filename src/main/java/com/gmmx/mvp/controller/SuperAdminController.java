@@ -28,11 +28,27 @@ public class SuperAdminController {
         return ApiResponse.success(superAdminService.getAllGyms(), "Gyms retrieved successfully");
     }
 
-    @DeleteMapping("/gyms/{id}")
+    @GetMapping("/gyms/{id}/users")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
-    @Operation(summary = "Delete Gym", description = "Permanently deletes a gym and all its associated users.")
-    public ApiResponse<Void> deleteGym(@PathVariable UUID id) {
-        superAdminService.deleteGym(id);
-        return ApiResponse.success(null, "Gym deleted successfully");
+    @Operation(summary = "List Gym Users", description = "Returns all users (members, trainers, owners) for a specific gym.")
+    public ApiResponse<List<com.gmmx.mvp.dto.AuthDtos.UserResponse>> getGymUsers(@PathVariable UUID id) {
+        return ApiResponse.success(superAdminService.getGymUsers(id), "Users retrieved successfully");
+    }
+
+    @PostMapping("/gyms/{id}/users")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @Operation(summary = "Add User to Gym", description = "Adds a new user (member) to a specific gym.")
+    public ApiResponse<com.gmmx.mvp.dto.AuthDtos.UserResponse> addUserToGym(
+            @PathVariable UUID id, 
+            @RequestBody com.gmmx.mvp.dto.AuthDtos.RegisterRequest request) {
+        return ApiResponse.success(superAdminService.addUserToGym(id, request), "User added successfully");
+    }
+
+    @PutMapping("/users/{userId}/reset-pin")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @Operation(summary = "Reset User PIN", description = "Changes the 4-digit PIN for a user.")
+    public ApiResponse<Void> resetPin(@PathVariable UUID userId, @RequestBody String newPin) {
+        superAdminService.resetUserPin(userId, newPin);
+        return ApiResponse.success(null, "PIN reset successfully");
     }
 }

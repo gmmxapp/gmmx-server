@@ -3,8 +3,12 @@ package com.gmmx.mvp.service;
 import com.gmmx.mvp.entity.Tenant;
 import com.gmmx.mvp.repository.TenantRepository;
 import com.gmmx.mvp.repository.UserAccountRepository;
+import com.gmmx.mvp.dto.AuthDtos;
+import com.gmmx.mvp.mapper.UserMapper;
+import com.gmmx.mvp.entity.UserAccount;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +22,8 @@ public class SuperAdminService {
 
     private final TenantRepository tenantRepository;
     private final UserAccountRepository userAccountRepository;
+    private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Data
     public static class GymOverview {
@@ -55,18 +61,32 @@ public class SuperAdminService {
         return overview;
     }
 
-    @Transactional
-    public void deleteGym(UUID tenantId) {
-        Tenant tenant = tenantRepository.findById(tenantId)
-                .orElseThrow(() -> new RuntimeException("Gym not found"));
-        
-        if (tenant.getSubdomain().equals("admin")) {
-            throw new RuntimeException("Cannot delete admin tenant");
-        }
+    public List<AuthDtos.UserResponse> getGymUsers(UUID tenantId) {
+        return userAccountRepository.findAllByTenantId(tenantId).stream()
+                .map(userMapper::toResponse)
+                .collect(Collectors.toList());
+    }
 
-        // Delete all users for this tenant
-        userAccountRepository.deleteByTenantId(tenantId);
-                
-        tenantRepository.delete(tenant);
+    @Transactional
+    public AuthDtos.UserResponse addUserToGym(UUID tenantId, AuthDtos.RegisterRequest request) {
+        UserAccount user = new UserAccount();
+        user.setTenantId(tenantId);
+        user.setEmail(request.getEmail());
+        user.setFullName(request.getOwnerName()); // Reuse ownerName field for full name
+        user.setCountryCode(request.getCountryCode() != null ? request.getCountryCode() : "+91");
+        user.setMobileNumber(com.gmmx.mvp.util.PhoneUtils.normalizeIdentifier(request.getPhone()));
+        user.setPasswordHash(passwordEncoder.encode(request.getPin()));
+        user.setRole(com.gmmx.mvp.entity.UserRole.MEMBER); // Default to member if not specified
+        
+        user = userAccountRepository.save(user);
+        return userMapper.toResponse(user);
+    }
+
+    @Transactional
+    public void resetUserPin(UUID userId, String newPin) {
+        UserAccount user = userAccountRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setPasswordHash(passwordEncoder.encode(newPin));
+        userAccountRepository.save(user);
     }
 }
