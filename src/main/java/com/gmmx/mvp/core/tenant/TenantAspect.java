@@ -20,6 +20,12 @@ public class TenantAspect {
     public void beforeRepositoryCall() {
         UUID tenantId = TenantContext.getTenantId();
         if (tenantId != null) {
+            // Skip filter for SUPER_ADMIN
+            org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SUPER_ADMIN"))) {
+                return;
+            }
+
             Session session = entityManager.unwrap(Session.class);
             session.enableFilter("tenantFilter").setParameter("tenantId", tenantId);
         }

@@ -20,4 +20,12 @@ public interface UserAccountRepository extends JpaRepository<UserAccount, UUID> 
     long countByRole(com.gmmx.mvp.entity.UserRole role);
     
     org.springframework.data.domain.Page<UserAccount> findByRole(com.gmmx.mvp.entity.UserRole role, org.springframework.data.domain.Pageable pageable);
+    
+    long countByTenantId(UUID tenantId);
+    
+    java.util.Optional<UserAccount> findByTenantIdAndRole(UUID tenantId, com.gmmx.mvp.entity.UserRole role);
+    
+    @org.springframework.data.jpa.repository.Modifying
+    @org.springframework.data.jpa.repository.Query("DELETE FROM UserAccount u WHERE u.tenantId = :tenantId")
+    void deleteByTenantId(UUID tenantId);
 }

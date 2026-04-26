@@ -13,6 +13,7 @@ public class TrainerDtos {
         private String fullName;
         private String email;
         private String mobile;
+        private String pin;
     }
 
     @Data

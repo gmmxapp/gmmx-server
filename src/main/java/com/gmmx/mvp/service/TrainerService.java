@@ -31,7 +31,20 @@ public class TrainerService {
         trainer.setEmail(request.getEmail());
         trainer.setMobile(request.getMobile());
         trainer.setRole(UserRole.TRAINER);
-        trainer.setPasswordHash(passwordEncoder.encode(generateTemporaryPassword()));
+        
+        // Use provided PIN or fallback to last 4 digits of mobile
+        String initialPin = request.getPin();
+        if (initialPin == null || initialPin.isEmpty()) {
+            if (request.getMobile() != null && request.getMobile().length() >= 4) {
+                initialPin = request.getMobile().substring(request.getMobile().length() - 4);
+            } else {
+                initialPin = "1234"; // Absolute fallback
+            }
+        }
+        trainer.setPasswordHash(passwordEncoder.encode(initialPin));
+        
+        // Ensure tenantId is set from context
+        trainer.setTenantId(com.gmmx.mvp.core.tenant.TenantContext.getTenantId());
         
         trainer = userAccountRepository.save(trainer);
         return mapToResponse(trainer);
@@ -74,9 +87,5 @@ public class TrainerService {
         response.setMobile(account.getMobile());
         response.setActive(account.isEnabled());
         return response;
-    }
-
-    private String generateTemporaryPassword() {
-        return UUID.randomUUID().toString() + UUID.randomUUID();
     }
 }

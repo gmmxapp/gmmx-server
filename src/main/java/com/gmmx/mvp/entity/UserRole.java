@@ -3,5 +3,6 @@ package com.gmmx.mvp.entity;
 public enum UserRole {
     OWNER,
     TRAINER,
-    MEMBER
+    MEMBER,
+    SUPER_ADMIN
 }
