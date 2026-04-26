@@ -27,9 +27,62 @@ public class OtpService {
         log.info("Generated OTP for identifier {}", identifier);
 
         if (identifier.contains("@")) {
-            String subject = "Gmmx- Your Verification Code";
-            String body = "Thanks for choosing Gmmx. \n\nYour verification code is: " + "<b>" + otp + "</b>"
-                    + "\n\nThis code will expire in 10 minutes.";
+            String subject = "Verify your Gmmx login";
+            String body = """
+                <!DOCTYPE html>
+                <html>
+                  <body style="margin:0; padding:0; background-color:#f6f7fb; font-family:Arial, sans-serif;">
+                    <table width="100%" cellpadding="0" cellspacing="0" style="padding:20px;">
+                      <tr>
+                        <td align="center">
+                          <table width="100%" style="max-width:400px; background:#ffffff; border-radius:12px; padding:24px; box-shadow:0 4px 12px rgba(0,0,0,0.05);" cellpadding="0" cellspacing="0">
+                            <tr>
+                              <td align="center" style="padding-bottom:16px;">
+                                <img src="https://api.gmmx.app/logo-gmmx.png" width="80" alt="GMMX" />
+                              </td>
+                            </tr>
+                            <tr>
+                              <td align="center" style="font-size:20px; font-weight:600; color:#222;">
+                                Verify your login
+                              </td>
+                            </tr>
+                            <tr>
+                              <td align="center" style="padding:12px 0; color:#555; font-size:14px;">
+                                Use the OTP below to continue. This code expires in 10 minutes.
+                              </td>
+                            </tr>
+                            <tr>
+                              <td align="center" style="padding:16px 0;">
+                                <div style="
+                                  display:inline-block;
+                                  padding:14px 24px;
+                                  font-size:26px;
+                                  letter-spacing:6px;
+                                  font-weight:bold;
+                                  background:#fff0f3;
+                                  color:#FF5C73;
+                                  border-radius:8px;
+                                  border:1px dashed #FF5C73;
+                                ">
+                                  %s
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td align="center" style="font-size:12px; color:#999; padding-top:10px;">
+                                If you didn’t request this, you can safely ignore this email.
+                              </td>
+                            </tr>
+                          </table>
+                          <div style="margin-top:12px; font-size:12px; color:#aaa;">
+                            © 2026 GMMX. All rights reserved.
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
+                  </body>
+                </html>
+                """.formatted(otp);
             emailService.sendEmail(identifier, subject, body);
         } else {
             // Integration with SMS service goes here
