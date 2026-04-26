@@ -55,7 +55,7 @@ public class SuperAdminService {
         userAccountRepository.findByTenantIdAndRole(tenant.getId(), com.gmmx.mvp.entity.UserRole.OWNER)
                 .ifPresent(owner -> {
                     overview.setOwnerEmail(owner.getEmail());
-                    overview.setOwnerMobile(owner.getMobile());
+                    overview.setOwnerMobile(owner.getMobileNumber());
                 });
                 
         return overview;
