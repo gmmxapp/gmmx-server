@@ -57,7 +57,7 @@ public class AuthService {
         UserAccount owner = new UserAccount();
         owner.setTenantId(tenant.getId()); 
         owner.setEmail(request.getEmail());
-        owner.setMobile(request.getPhone());
+        owner.setMobile(com.gmmx.mvp.util.PhoneUtils.normalizeIdentifier(request.getPhone()));
         owner.setFullName(request.getOwnerName());
         owner.setPasswordHash(passwordEncoder.encode(request.getPin()));
         owner.setRole(UserRole.OWNER);
@@ -82,23 +82,32 @@ public class AuthService {
         Tenant tenant = tenantRepository.findBySubdomain(request.getGymId())
                 .orElseThrow(() -> new RuntimeException("Gym not found: " + request.getGymId()));
 
-        // 2. Find User within Tenant
-        String identifier = request.getIdentifier().trim();
-        UserAccount user = userAccountRepository.findByEmailOrMobileAndTenantId(identifier, identifier, tenant.getId())
-                .orElseThrow(() -> new RuntimeException("User not found in this gym."));
+        // 2. Normalize Identifier
+        String identifier = com.gmmx.mvp.util.PhoneUtils.normalizeIdentifier(request.getIdentifier());
 
-        // 3. Brute force check
+        // 3. Find User
+        // First try finding user in the specific tenant
+        UserAccount user = userAccountRepository.findByEmailOrMobileAndTenantId(identifier, identifier, tenant.getId())
+                .orElseGet(() -> {
+                    // If not found, check if it's a Super Admin from the 'admin' tenant
+                    // This allows Super Admins to log into the mobile app as well
+                    return userAccountRepository.findByEmailOrMobile(identifier, identifier)
+                            .filter(u -> u.getRole() == UserRole.SUPER_ADMIN)
+                            .orElseThrow(() -> new RuntimeException("User not found in this gym."));
+                });
+
+        // 4. Brute force check
         if (user.isAccountLocked()) {
             throw new RuntimeException("Account is locked due to too many failed attempts. Contact owner.");
         }
 
-        // 4. Verify PIN
+        // 5. Verify PIN
         if (!passwordEncoder.matches(request.getPin(), user.getPasswordHash())) {
             handleFailedLogin(user);
             throw new RuntimeException("Invalid PIN.");
         }
 
-        // 5. Device Binding Check
+        // 6. Device Binding Check
         if (user.getDeviceId() != null && !user.getDeviceId().equals(request.getDeviceId())) {
             System.out.println("Security: Device mismatch for user " + user.getEmail() + ". Attempted from: " + request.getDeviceId());
             // Optionally: throw new RuntimeException("New device detected. Verification required.");
@@ -107,6 +116,7 @@ public class AuthService {
         // Update device ID if first time
         if (user.getDeviceId() == null && request.getDeviceId() != null) {
             user.setDeviceId(request.getDeviceId());
+            userAccountRepository.save(user); // Save the update
         }
 
         // Reset failed attempts

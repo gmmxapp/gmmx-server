@@ -32,10 +32,10 @@ public class OtpService {
                 <!DOCTYPE html>
                 <html>
                   <body style="margin:0; padding:0; background-color:#f6f7fb; font-family:Arial, sans-serif;">
-                    <table width="100%" cellpadding="0" cellspacing="0" style="padding:20px;">
+                    <table width="100%%" cellpadding="0" cellspacing="0" style="padding:20px;">
                       <tr>
                         <td align="center">
-                          <table width="100%" style="max-width:400px; background:#ffffff; border-radius:12px; padding:24px; box-shadow:0 4px 12px rgba(0,0,0,0.05);" cellpadding="0" cellspacing="0">
+                          <table width="100%%" style="max-width:400px; background:#ffffff; border-radius:12px; padding:24px; box-shadow:0 4px 12px rgba(0,0,0,0.05);" cellpadding="0" cellspacing="0">
                             <tr>
                               <td align="center" style="padding-bottom:16px;">
                                 <img src="https://api.gmmx.app/logo-gmmx.png" width="80" alt="GMMX" />

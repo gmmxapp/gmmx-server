@@ -37,7 +37,7 @@ public class MemberService {
         UserAccount user = new UserAccount();
         user.setEmail(request.getEmail());
         user.setFullName(request.getFullName());
-        user.setMobile(request.getMobile());
+        user.setMobile(com.gmmx.mvp.util.PhoneUtils.normalizeIdentifier(request.getMobile()));
         user.setRole(UserRole.MEMBER);
         user.setPasswordHash(passwordEncoder.encode(generateTemporaryPassword()));
         user = userAccountRepository.save(user);
