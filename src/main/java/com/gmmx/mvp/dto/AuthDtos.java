@@ -52,6 +52,8 @@ public class AuthDtos {
         @NotBlank @Email
         private String email;
         @NotBlank
+        private String countryCode;
+        @NotBlank
         private String phone;
         @NotBlank @Size(min = 4, max = 4)
         private String pin;
@@ -71,6 +73,7 @@ public class AuthDtos {
         private UUID id;
         private String email;
         private String fullName;
+        private String countryCode;
         private String mobile;
         private UserRole role;
         private UUID tenantId;

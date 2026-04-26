@@ -30,7 +30,11 @@ public class UserAccount extends BaseEntity implements UserDetails {
     @Column(nullable = false)
     private String fullName;
 
-    private String mobile;
+    @Column(name = "country_code")
+    private String countryCode = "+91";
+
+    @Column(name = "mobile_number")
+    private String mobileNumber;
 
     @Column(nullable = false)
     private String passwordHash;

@@ -34,7 +34,11 @@ public class Tenant {
     private String displayName;
     private String logoUrl;
     private String address;
-    private String contactPhone;
+    @Column(name = "country_code")
+    private String countryCode = "+91";
+
+    @Column(name = "contact_mobile_number")
+    private String contactMobileNumber;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

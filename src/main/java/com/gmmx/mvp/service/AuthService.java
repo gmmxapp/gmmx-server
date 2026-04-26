@@ -57,7 +57,8 @@ public class AuthService {
         UserAccount owner = new UserAccount();
         owner.setTenantId(tenant.getId()); 
         owner.setEmail(request.getEmail());
-        owner.setMobile(com.gmmx.mvp.util.PhoneUtils.normalizeIdentifier(request.getPhone()));
+        owner.setCountryCode(request.getCountryCode() != null ? request.getCountryCode() : "+91");
+        owner.setMobileNumber(com.gmmx.mvp.util.PhoneUtils.normalizeIdentifier(request.getPhone()));
         owner.setFullName(request.getOwnerName());
         owner.setPasswordHash(passwordEncoder.encode(request.getPin()));
         owner.setRole(UserRole.OWNER);
@@ -87,11 +88,11 @@ public class AuthService {
 
         // 3. Find User
         // First try finding user in the specific tenant
-        UserAccount user = userAccountRepository.findByEmailOrMobileAndTenantId(identifier, identifier, tenant.getId())
+        UserAccount user = userAccountRepository.findByEmailOrMobileNumberAndTenantId(identifier, identifier, tenant.getId())
                 .orElseGet(() -> {
                     // If not found, check if it's a Super Admin from the 'admin' tenant
                     // This allows Super Admins to log into the mobile app as well
-                    return userAccountRepository.findByEmailOrMobile(identifier, identifier)
+                    return userAccountRepository.findByEmailOrMobileNumber(identifier, identifier)
                             .filter(u -> u.getRole() == UserRole.SUPER_ADMIN)
                             .orElseThrow(() -> new RuntimeException("User not found in this gym."));
                 });

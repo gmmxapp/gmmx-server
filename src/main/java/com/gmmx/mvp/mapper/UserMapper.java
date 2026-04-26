@@ -11,5 +11,6 @@ public interface UserMapper {
 
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
+    @Mapping(source = "mobileNumber", target = "mobile")
     AuthDtos.UserResponse toResponse(UserAccount user);
 }
