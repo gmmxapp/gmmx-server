@@ -1,2 +1,0 @@
-ALTER TABLE tenants ADD COLUMN has_microsite BOOLEAN NOT NULL DEFAULT FALSE;
-ALTER TABLE tenants_aud ADD COLUMN has_microsite BOOLEAN;

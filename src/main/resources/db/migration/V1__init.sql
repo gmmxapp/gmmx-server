@@ -15,6 +15,7 @@ CREATE TABLE tenants (
     contact_phone VARCHAR(50),
     plan VARCHAR(50) NOT NULL,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    has_microsite BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP
 );
@@ -172,6 +173,7 @@ CREATE TABLE tenants_aud (
     contact_phone VARCHAR(50),
     plan VARCHAR(50),
     is_active BOOLEAN,
+    has_microsite BOOLEAN,
     created_at TIMESTAMP,
     updated_at TIMESTAMP,
     PRIMARY KEY (id, rev)
