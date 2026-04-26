@@ -34,7 +34,7 @@ public class EmailService {
             headers.setBearerAuth(resendApiKey);
 
             Map<String, Object> requestBody = new HashMap<>();
-            requestBody.put("from", "onboarding@resend.dev"); // Replace with your verified Resend domain when ready
+            requestBody.put("from", "noreply@gmmx.app");
             requestBody.put("to", List.of(to));
             requestBody.put("subject", subject);
             requestBody.put("html", body);
