@@ -158,7 +158,7 @@ CREATE TABLE revinfo (
     revtstmp BIGINT
 );
 
-CREATE SEQUENCE revinfo_seq START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE revinfo_seq START WITH 1 INCREMENT BY 50;
 
 CREATE TABLE tenants_aud (
     id UUID NOT NULL,
