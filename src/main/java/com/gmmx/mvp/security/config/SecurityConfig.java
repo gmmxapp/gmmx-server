@@ -42,7 +42,10 @@ public class SecurityConfig {
                     "/api/tenants/lookup/**",
                     "/v3/api-docs/**",
                     "/swagger-ui/**",
-                    "/swagger-ui.html"
+                    "/swagger-ui.html",
+                    "/logo-gmmx.png",
+                    "/static/**",
+                    "/favicon.ico"
                 ).permitAll()
                 .anyRequest().authenticated()
             )
