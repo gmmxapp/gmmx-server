@@ -43,6 +43,9 @@ public class Tenant {
     @Column(nullable = false)
     private boolean isActive = true;
 
+    @Column(nullable = false)
+    private boolean hasMicrosite = false;
+
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

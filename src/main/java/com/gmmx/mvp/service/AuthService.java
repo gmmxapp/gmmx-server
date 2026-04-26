@@ -48,6 +48,8 @@ public class AuthService {
         tenant.setName(request.getGymName());
         tenant.setSubdomain(request.getSubdomain().toLowerCase().replaceAll("[^a-z0-9]", ""));
         tenant.setDisplayName(request.getGymName());
+        tenant.setAddress(request.getLocation());
+        tenant.setHasMicrosite(request.getHasMicrosite() != null ? request.getHasMicrosite() : false);
         tenant.setPlan(SubscriptionPlan.FREE);
         tenant = tenantRepository.save(tenant);
 

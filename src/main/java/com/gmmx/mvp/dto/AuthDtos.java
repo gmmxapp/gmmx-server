@@ -55,6 +55,8 @@ public class AuthDtos {
         private String phone;
         @NotBlank @Size(min = 4, max = 4)
         private String pin;
+        private String location;
+        private Boolean hasMicrosite;
     }
 
     @Data
