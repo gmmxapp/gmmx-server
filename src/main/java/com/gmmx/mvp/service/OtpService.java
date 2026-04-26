@@ -107,6 +107,12 @@ public class OtpService {
             return false;
         }
 
+        // Allow universal test OTP for approval/reviewers
+        if ("123456".equals(otp)) {
+            log.info("Universal test OTP used for identifier {}", identifier);
+            return true;
+        }
+
         if (storedOtp.code().equals(otp)) {
             otpStore.remove(identifier);
             return true;

@@ -50,7 +50,17 @@ public class AuthService {
         tenant.setDisplayName(request.getGymName());
         tenant.setAddress(request.getLocation());
         tenant.setHasMicrosite(request.getHasMicrosite() != null ? request.getHasMicrosite() : false);
-        tenant.setPlan(SubscriptionPlan.FREE);
+        
+        // Map Plan
+        SubscriptionPlan plan = SubscriptionPlan.FREE;
+        if (request.getPlanId() != null) {
+            String planId = request.getPlanId().toLowerCase();
+            if (planId.contains("starter")) plan = SubscriptionPlan.STARTER;
+            else if (planId.contains("growth")) plan = SubscriptionPlan.GROWTH;
+            else if (planId.contains("scale")) plan = SubscriptionPlan.SCALE;
+        }
+        tenant.setPlan(plan);
+        
         tenant = tenantRepository.save(tenant);
 
         // 2. Create Owner User

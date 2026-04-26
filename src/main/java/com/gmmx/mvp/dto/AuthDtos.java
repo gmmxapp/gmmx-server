@@ -59,6 +59,8 @@ public class AuthDtos {
         private String pin;
         private String location;
         private Boolean hasMicrosite;
+        private String planId;
+        private String paymentId;
     }
 
     @Data
