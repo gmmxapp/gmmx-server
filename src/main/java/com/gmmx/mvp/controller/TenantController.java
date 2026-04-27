@@ -26,7 +26,7 @@ public class TenantController {
                 .displayName(tenant.getDisplayName() != null ? tenant.getDisplayName() : tenant.getName())
                 .logoUrl(tenant.getLogoUrl())
                 .address(tenant.getAddress())
-                .contactPhone(tenant.getContactPhone())
+                .contactPhone(tenant.getContactMobileNumber())
                 .build();
 
         return ApiResponse.success(response, "Gym found");

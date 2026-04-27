@@ -27,7 +27,7 @@ public class DataSeeder implements CommandLineRunner {
             adminTenant.setName("System Admin");
             adminTenant.setSubdomain("admin");
             adminTenant.setDisplayName("Gmmx Admin");
-            adminTenant.setPlan(SubscriptionPlan.PRO);
+            adminTenant.setPlan(SubscriptionPlan.SCALE);
             adminTenant = tenantRepository.save(adminTenant);
 
             // Create Super Admin User
