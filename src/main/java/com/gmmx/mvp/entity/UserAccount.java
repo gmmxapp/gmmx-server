@@ -36,6 +36,14 @@ public class UserAccount extends BaseEntity implements UserDetails {
     @Column(name = "mobile_number")
     private String mobileNumber;
 
+    public String getMobile() {
+        return mobileNumber;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobileNumber = mobile;
+    }
+
     @Column(nullable = false)
     private String passwordHash;
 

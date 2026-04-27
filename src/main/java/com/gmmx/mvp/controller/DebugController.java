@@ -14,7 +14,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/debug")
 @RequiredArgsConstructor
-@Profile("dev")
 public class DebugController {
 
     private final UserAccountRepository userAccountRepository;
