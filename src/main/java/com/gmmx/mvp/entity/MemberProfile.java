@@ -29,4 +29,8 @@ public class MemberProfile extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private MembershipStatus status = MembershipStatus.ACTIVE;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assigned_trainer_id")
+    private TrainerProfile assignedTrainer;
 }

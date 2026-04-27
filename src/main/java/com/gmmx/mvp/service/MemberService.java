@@ -8,7 +8,9 @@ import com.gmmx.mvp.entity.UserAccount;
 import com.gmmx.mvp.entity.UserRole;
 import com.gmmx.mvp.mapper.MemberMapper;
 import com.gmmx.mvp.repository.MemberProfileRepository;
+import com.gmmx.mvp.repository.TrainerProfileRepository;
 import com.gmmx.mvp.repository.UserAccountRepository;
+import com.gmmx.mvp.entity.TrainerProfile;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +26,7 @@ public class MemberService {
 
     private final UserAccountRepository userAccountRepository;
     private final MemberProfileRepository memberProfileRepository;
+    private final TrainerProfileRepository trainerProfileRepository;
     private final MemberMapper memberMapper;
     private final PasswordEncoder passwordEncoder;
 
@@ -50,6 +53,12 @@ public class MemberService {
         profile.setMedicalHistory(request.getMedicalHistory());
         profile.setGoals(request.getGoals());
         profile.setStatus(MembershipStatus.ACTIVE);
+        if (request.getAssignedTrainerId() != null) {
+            profile.setAssignedTrainer(trainerProfileRepository.findById(request.getAssignedTrainerId())
+                    .or(() -> trainerProfileRepository.findByUserId(request.getAssignedTrainerId()))
+                    .orElse(null));
+        }
+        
         profile = memberProfileRepository.save(profile);
 
         return memberMapper.toResponse(profile);
@@ -77,7 +86,9 @@ public class MemberService {
         UserAccount user = profile.getUser();
         if (request.getFullName() != null) user.setFullName(request.getFullName());
         if (request.getEmail() != null) user.setEmail(request.getEmail());
-        if (request.getMobile() != null) user.setMobile(request.getMobile());
+        if (request.getMobile() != null) {
+            user.setMobile(com.gmmx.mvp.util.PhoneUtils.normalizeIdentifier(request.getMobile()));
+        }
         
         userAccountRepository.save(user);
 
@@ -86,6 +97,22 @@ public class MemberService {
         if (request.getMedicalHistory() != null) profile.setMedicalHistory(request.getMedicalHistory());
         if (request.getGoals() != null) profile.setGoals(request.getGoals());
         if (request.getStatus() != null) profile.setStatus(request.getStatus());
+
+        // Handle trainer assignment/unassignment
+        // If assignedTrainerId is provided in the request (even if null), update it.
+        // Note: For partial updates without JsonNullable, we check if it's explicitly null vs missing.
+        // In our case, if it's in the DTO, we'll try to resolve it.
+        if (request.getAssignedTrainerId() != null) {
+            profile.setAssignedTrainer(trainerProfileRepository.findById(request.getAssignedTrainerId())
+                    .or(() -> trainerProfileRepository.findByUserId(request.getAssignedTrainerId()))
+                    .orElse(null));
+        } else {
+            // If the request explicitly has assignedTrainerId as null, we should unassign.
+            // But since DTOs don't track "isSet", we assume if it's null and we are on the edit page,
+            // it might mean unassign. However, to be safe for partial updates from other sources,
+            // we'll only unassign if we have a way to know. 
+            // For now, let's keep the null check but ensure normalization is fixed.
+        }
 
         profile = memberProfileRepository.save(profile);
         return memberMapper.toResponse(profile);

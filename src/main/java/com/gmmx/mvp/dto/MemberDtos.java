@@ -19,6 +19,7 @@ public class MemberDtos {
         private Double weight;
         private String medicalHistory;
         private String goals;
+        private UUID assignedTrainerId;
     }
 
     @Data
@@ -31,6 +32,7 @@ public class MemberDtos {
         private String medicalHistory;
         private String goals;
         private MembershipStatus status;
+        private UUID assignedTrainerId;
     }
 
     @Data
@@ -44,5 +46,7 @@ public class MemberDtos {
         private String medicalHistory;
         private String goals;
         private MembershipStatus status;
+        private UUID assignedTrainerId;
+        private String assignedTrainerName;
     }
 }

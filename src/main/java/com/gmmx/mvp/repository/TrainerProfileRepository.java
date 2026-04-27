@@ -8,4 +8,5 @@ import java.util.UUID;
 
 @Repository
 public interface TrainerProfileRepository extends JpaRepository<TrainerProfile, UUID> {
+    java.util.Optional<TrainerProfile> findByUserId(UUID userId);
 }
