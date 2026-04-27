@@ -25,21 +25,21 @@ public class TrainerController {
     private final TrainerService trainerService;
 
     @PostMapping
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasAnyRole('OWNER', 'SUPER_ADMIN')")
     @Operation(summary = "Create a new Trainer", description = "Creates a UserAccount with role TRAINER.")
     public ApiResponse<TrainerDtos.TrainerResponse> create(@Valid @RequestBody TrainerDtos.TrainerCreateRequest request) {
         return ApiResponse.success(trainerService.createTrainer(request), "Trainer created successfully");
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasAnyRole('OWNER', 'SUPER_ADMIN')")
     @Operation(summary = "Update Trainer", description = "Updates an existing trainer's details.")
     public ApiResponse<TrainerDtos.TrainerResponse> update(@PathVariable UUID id, @Valid @RequestBody TrainerDtos.TrainerUpdateRequest request) {
         return ApiResponse.success(trainerService.updateTrainer(id, request), "Trainer updated successfully");
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasAnyRole('OWNER', 'SUPER_ADMIN')")
     @Operation(summary = "Delete Trainer", description = "Deletes a trainer from the system.")
     public ApiResponse<Void> delete(@PathVariable UUID id) {
         trainerService.deleteTrainer(id);
@@ -47,7 +47,7 @@ public class TrainerController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasAnyRole('OWNER', 'SUPER_ADMIN')")
     @Operation(summary = "List all Trainers", description = "Returns a paginated list of all trainers in the current gym.")
     public ApiResponse<Page<TrainerDtos.TrainerResponse>> getAll(Pageable pageable) {
         return ApiResponse.success(trainerService.getAllTrainers(pageable), "Trainers retrieved successfully");
