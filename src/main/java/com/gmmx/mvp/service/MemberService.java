@@ -71,6 +71,7 @@ public class MemberService {
     @Transactional
     public MemberDtos.MemberResponse updateMember(UUID id, MemberDtos.MemberUpdateRequest request) {
         MemberProfile profile = memberProfileRepository.findById(id)
+                .or(() -> memberProfileRepository.findByUserId(id))
                 .orElseThrow(() -> new RuntimeException("Member not found"));
 
         UserAccount user = profile.getUser();
@@ -93,6 +94,7 @@ public class MemberService {
     @Transactional
     public void deleteMember(UUID id) {
         MemberProfile profile = memberProfileRepository.findById(id)
+                .or(() -> memberProfileRepository.findByUserId(id))
                 .orElseThrow(() -> new RuntimeException("Member not found"));
         
         UserAccount user = profile.getUser();
