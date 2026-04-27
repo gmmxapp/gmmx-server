@@ -23,6 +23,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtils jwtUtils;
     private final UserDetailsService userDetailsService;
+    private final com.gmmx.mvp.repository.UserAccountRepository userAccountRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -42,7 +43,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         UUID tenantId = jwtUtils.extractTenantId(jwt);
 
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+            UserDetails userDetails;
+            if (tenantId != null) {
+                userDetails = userAccountRepository.findByEmailAndTenantId(userEmail, tenantId)
+                        .orElseThrow(() -> new org.springframework.security.core.userdetails.UsernameNotFoundException("User not found in tenant"));
+            } else {
+                userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+            }
             
             if (jwtUtils.isTokenValid(jwt, userDetails)) {
                 // Critical: Inject tenantId from JWT into TenantContext
