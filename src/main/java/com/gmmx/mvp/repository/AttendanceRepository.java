@@ -15,4 +15,7 @@ public interface AttendanceRepository extends JpaRepository<Attendance, UUID> {
     List<Attendance> findByMemberAndDate(MemberProfile member, LocalDate date);
     Optional<Attendance> findTopByMemberIdAndDateAndCheckOutIsNullOrderByCheckInDesc(UUID memberId, LocalDate date);
     List<Attendance> findByMemberIdOrderByDateDesc(UUID memberId);
+    java.util.List<Attendance> findByTenantIdAndDateBetween(UUID tenantId, java.time.LocalDateTime start, java.time.LocalDateTime end);
+    @org.springframework.data.jpa.repository.Modifying
+    void deleteByTenantId(UUID tenantId);
 }

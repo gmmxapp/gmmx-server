@@ -26,6 +26,10 @@ public class SuperAdminService {
     private final MemberProfileRepository memberProfileRepository;
     private final TrainerProfileRepository trainerProfileRepository;
     private final MembershipPlanRepository membershipPlanRepository;
+    private final SubscriptionRepository subscriptionRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final AttendanceRepository attendanceRepository;
+    private final EquipmentRepository equipmentRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
@@ -89,6 +93,10 @@ public class SuperAdminService {
     @Transactional
     public void deleteGym(UUID tenantId) {
         // Delete all associated data
+        attendanceRepository.deleteByTenantId(tenantId);
+        equipmentRepository.deleteByTenantId(tenantId);
+        refreshTokenRepository.deleteByTenantId(tenantId);
+        subscriptionRepository.deleteByTenantId(tenantId);
         userAccountRepository.deleteByTenantId(tenantId);
         memberProfileRepository.deleteByTenantId(tenantId);
         trainerProfileRepository.deleteByTenantId(tenantId);

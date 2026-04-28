@@ -10,5 +10,6 @@ import java.util.UUID;
 public interface MembershipPlanRepository extends JpaRepository<MembershipPlan, UUID> {
     java.util.List<MembershipPlan> findAllByTenantId(UUID tenantId);
     java.util.Optional<MembershipPlan> findByIdAndTenantId(UUID id, UUID tenantId);
+    @org.springframework.data.jpa.repository.Modifying
     void deleteByTenantId(UUID tenantId);
 }

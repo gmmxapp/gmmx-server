@@ -10,4 +10,6 @@ import java.util.UUID;
 public interface EquipmentRepository extends JpaRepository<Equipment, UUID> {
     java.util.List<Equipment> findAllByTenantId(UUID tenantId);
     java.util.Optional<Equipment> findByIdAndTenantId(UUID id, UUID tenantId);
+    @org.springframework.data.jpa.repository.Modifying
+    void deleteByTenantId(UUID tenantId);
 }

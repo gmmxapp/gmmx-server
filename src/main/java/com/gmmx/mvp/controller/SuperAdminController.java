@@ -47,9 +47,13 @@ public class SuperAdminController {
     @DeleteMapping("/gyms/{id}")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     @Operation(summary = "Delete Gym", description = "Permanently removes a gym and ALL its associated data (users, members, equipment, etc.).")
-    public ApiResponse<Void> deleteGym(@PathVariable UUID id) {
-        superAdminService.deleteGym(id);
-        return ApiResponse.success(null, "Gym deleted successfully");
+    public ApiResponse<Void> deleteGym(@PathVariable("id") String id) {
+        try {
+            superAdminService.deleteGym(UUID.fromString(id));
+            return ApiResponse.success(null, "Gym deleted successfully");
+        } catch (IllegalArgumentException e) {
+            return ApiResponse.error("Invalid Gym ID format", 400);
+        }
     }
 
     @PutMapping("/users/{userId}/reset-pin")

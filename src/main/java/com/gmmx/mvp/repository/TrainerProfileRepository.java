@@ -9,5 +9,6 @@ import java.util.UUID;
 @Repository
 public interface TrainerProfileRepository extends JpaRepository<TrainerProfile, UUID> {
     java.util.Optional<TrainerProfile> findByUserId(UUID userId);
+    @org.springframework.data.jpa.repository.Modifying
     void deleteByTenantId(UUID tenantId);
 }

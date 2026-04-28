@@ -8,4 +8,6 @@ import java.util.UUID;
 
 @Repository
 public interface SubscriptionRepository extends JpaRepository<Subscription, UUID> {
+    @org.springframework.data.jpa.repository.Modifying
+    void deleteByTenantId(UUID tenantId);
 }

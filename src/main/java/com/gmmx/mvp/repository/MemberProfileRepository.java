@@ -10,5 +10,6 @@ import java.util.UUID;
 public interface MemberProfileRepository extends JpaRepository<MemberProfile, UUID> {
     java.util.Optional<MemberProfile> findByUserId(UUID userId);
     java.util.Optional<MemberProfile> findByIdAndTenantId(UUID id, UUID tenantId);
+    @org.springframework.data.jpa.repository.Modifying
     void deleteByTenantId(UUID tenantId);
 }
