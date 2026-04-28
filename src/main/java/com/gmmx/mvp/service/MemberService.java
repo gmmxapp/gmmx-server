@@ -27,6 +27,7 @@ public class MemberService {
     private final UserAccountRepository userAccountRepository;
     private final MemberProfileRepository memberProfileRepository;
     private final TrainerProfileRepository trainerProfileRepository;
+    private final com.gmmx.mvp.repository.MembershipPlanRepository membershipPlanRepository;
     private final MemberMapper memberMapper;
     private final PasswordEncoder passwordEncoder;
 
@@ -58,6 +59,15 @@ public class MemberService {
                     .or(() -> trainerProfileRepository.findByUserId(request.getAssignedTrainerId()))
                     .orElse(null));
         }
+
+        if (request.getMembershipPlanId() != null) {
+            profile.setMembershipPlan(membershipPlanRepository.findById(request.getMembershipPlanId()).orElse(null));
+        }
+
+        profile.setJoinDate(request.getJoinDate());
+        profile.setExpiryDate(request.getExpiryDate());
+        profile.setFeesPaid(request.getFeesPaid());
+        profile.setFeesNotes(request.getFeesNotes());
         
         profile = memberProfileRepository.save(profile);
 
@@ -106,13 +116,16 @@ public class MemberService {
             profile.setAssignedTrainer(trainerProfileRepository.findById(request.getAssignedTrainerId())
                     .or(() -> trainerProfileRepository.findByUserId(request.getAssignedTrainerId()))
                     .orElse(null));
-        } else {
-            // If the request explicitly has assignedTrainerId as null, we should unassign.
-            // But since DTOs don't track "isSet", we assume if it's null and we are on the edit page,
-            // it might mean unassign. However, to be safe for partial updates from other sources,
-            // we'll only unassign if we have a way to know. 
-            // For now, let's keep the null check but ensure normalization is fixed.
         }
+
+        if (request.getMembershipPlanId() != null) {
+            profile.setMembershipPlan(membershipPlanRepository.findById(request.getMembershipPlanId()).orElse(null));
+        }
+
+        if (request.getJoinDate() != null) profile.setJoinDate(request.getJoinDate());
+        if (request.getExpiryDate() != null) profile.setExpiryDate(request.getExpiryDate());
+        if (request.getFeesPaid() != null) profile.setFeesPaid(request.getFeesPaid());
+        if (request.getFeesNotes() != null) profile.setFeesNotes(request.getFeesNotes());
 
         profile = memberProfileRepository.save(profile);
         return memberMapper.toResponse(profile);

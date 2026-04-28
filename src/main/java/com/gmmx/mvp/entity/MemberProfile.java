@@ -37,4 +37,7 @@ public class MemberProfile extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "membership_plan_id")
     private MembershipPlan membershipPlan;
+
+    private java.math.BigDecimal feesPaid;
+    private String feesNotes;
 }

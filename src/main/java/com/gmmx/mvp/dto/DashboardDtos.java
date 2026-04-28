@@ -12,6 +12,15 @@ public class DashboardDtos {
         private String activeTrainers;
         private String monthlyRevenue;
         private String newMembersThisMonth;
+        private java.util.List<DailyRevenue> weeklyRevenue;
+        private String totalWeeklyRevenue;
+    }
+
+    @Data
+    @Builder
+    public static class DailyRevenue {
+        private String day; // Mon, Tue, etc.
+        private double amount;
     }
 
     @Data

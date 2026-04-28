@@ -4,5 +4,6 @@ public enum SubscriptionPlan {
     FREE,
     STARTER,
     GROWTH,
-    SCALE
+    SCALE,
+    PRO
 }

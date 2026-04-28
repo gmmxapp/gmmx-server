@@ -20,6 +20,11 @@ public class MemberDtos {
         private String medicalHistory;
         private String goals;
         private UUID assignedTrainerId;
+        private UUID membershipPlanId;
+        private java.time.LocalDate joinDate;
+        private java.time.LocalDate expiryDate;
+        private java.math.BigDecimal feesPaid;
+        private String feesNotes;
     }
 
     @Data
@@ -33,6 +38,11 @@ public class MemberDtos {
         private String goals;
         private MembershipStatus status;
         private UUID assignedTrainerId;
+        private UUID membershipPlanId;
+        private java.time.LocalDate joinDate;
+        private java.time.LocalDate expiryDate;
+        private java.math.BigDecimal feesPaid;
+        private String feesNotes;
     }
 
     @Data
@@ -48,5 +58,11 @@ public class MemberDtos {
         private MembershipStatus status;
         private UUID assignedTrainerId;
         private String assignedTrainerName;
+        private UUID membershipPlanId;
+        private String membershipPlanName;
+        private java.time.LocalDate joinDate;
+        private java.time.LocalDate expiryDate;
+        private java.math.BigDecimal feesPaid;
+        private String feesNotes;
     }
 }

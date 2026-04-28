@@ -16,5 +16,7 @@ public interface MemberMapper {
     @Mapping(source = "user.mobile", target = "mobile")
     @Mapping(source = "assignedTrainer.id", target = "assignedTrainerId")
     @Mapping(source = "assignedTrainer.user.fullName", target = "assignedTrainerName")
+    @Mapping(source = "membershipPlan.id", target = "membershipPlanId")
+    @Mapping(source = "membershipPlan.name", target = "membershipPlanName")
     MemberDtos.MemberResponse toResponse(MemberProfile profile);
 }

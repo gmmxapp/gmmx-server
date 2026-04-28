@@ -16,22 +16,55 @@ import java.util.Locale;
 public class DashboardService {
 
     private final UserAccountRepository userAccountRepository;
+    private final com.gmmx.mvp.repository.MemberProfileRepository memberProfileRepository;
 
     public DashboardDtos.OwnerStatsResponse getOwnerStats() {
-        // Real counts from DB
         long totalMembers = userAccountRepository.countByRole(UserRole.MEMBER);
         long activeTrainers = userAccountRepository.countByRole(UserRole.TRAINER);
         
-        // Mocking revenue for now as payment implementation might be partial
-        // but we can calculate it if payments table is populated.
-        String monthlyRevenue = "₹0.0"; 
-        String newMembersThisMonth = "+0";
+        java.time.LocalDate now = java.time.LocalDate.now();
+        java.time.LocalDate monthStart = now.withDayOfMonth(1);
+        
+        // Real Revenue from Member Profiles
+        java.math.BigDecimal monthlyRevenueVal = memberProfileRepository.findAll().stream()
+                .filter(m -> m.getJoinDate() != null && !m.getJoinDate().isBefore(monthStart))
+                .map(m -> m.getFeesPaid() != null ? m.getFeesPaid() : java.math.BigDecimal.ZERO)
+                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+        
+        long newMembersThisMonthCount = memberProfileRepository.findAll().stream()
+                .filter(m -> m.getJoinDate() != null && !m.getJoinDate().isBefore(monthStart))
+                .count();
 
+        // Calculate Weekly Revenue
+        List<DashboardDtos.DailyRevenue> weeklyRevenue = new ArrayList<>();
+        java.math.BigDecimal totalWeekly = java.math.BigDecimal.ZERO;
+        
+        for (int i = 6; i >= 0; i--) {
+            java.time.LocalDate date = now.minusDays(i);
+            String dayName = date.getDayOfWeek().name().substring(0, 3);
+            
+            java.math.BigDecimal dailyAmount = memberProfileRepository.findAll().stream()
+                .filter(m -> m.getJoinDate() != null && m.getJoinDate().equals(date))
+                .map(m -> m.getFeesPaid() != null ? m.getFeesPaid() : java.math.BigDecimal.ZERO)
+                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+            
+            weeklyRevenue.add(DashboardDtos.DailyRevenue.builder()
+                .day(dayName)
+                .amount(dailyAmount.doubleValue())
+                .build());
+            
+            totalWeekly = totalWeekly.add(dailyAmount);
+        }
+
+        NumberFormat format = NumberFormat.getCurrencyInstance(new Locale("en", "IN"));
+        
         return DashboardDtos.OwnerStatsResponse.builder()
                 .totalMembers(String.format("%,d", totalMembers))
                 .activeTrainers(String.valueOf(activeTrainers))
-                .monthlyRevenue(monthlyRevenue)
-                .newMembersThisMonth(newMembersThisMonth)
+                .monthlyRevenue(format.format(monthlyRevenueVal))
+                .newMembersThisMonth("+" + newMembersThisMonthCount)
+                .weeklyRevenue(weeklyRevenue)
+                .totalWeeklyRevenue(format.format(totalWeekly))
                 .build();
     }
 
