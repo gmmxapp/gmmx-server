@@ -11,5 +11,6 @@ public interface MemberProfileRepository extends JpaRepository<MemberProfile, UU
     java.util.Optional<MemberProfile> findByUserId(UUID userId);
     java.util.Optional<MemberProfile> findByIdAndTenantId(UUID id, UUID tenantId);
     @org.springframework.data.jpa.repository.Modifying
+    @org.springframework.data.jpa.repository.Query("DELETE FROM MemberProfile m WHERE m.tenantId = :tenantId")
     void deleteByTenantId(UUID tenantId);
 }

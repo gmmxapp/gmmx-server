@@ -11,5 +11,6 @@ public interface MembershipPlanRepository extends JpaRepository<MembershipPlan, 
     java.util.List<MembershipPlan> findAllByTenantId(UUID tenantId);
     java.util.Optional<MembershipPlan> findByIdAndTenantId(UUID id, UUID tenantId);
     @org.springframework.data.jpa.repository.Modifying
+    @org.springframework.data.jpa.repository.Query("DELETE FROM MembershipPlan m WHERE m.tenantId = :tenantId")
     void deleteByTenantId(UUID tenantId);
 }

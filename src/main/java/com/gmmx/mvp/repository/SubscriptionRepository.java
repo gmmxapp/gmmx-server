@@ -9,5 +9,6 @@ import java.util.UUID;
 @Repository
 public interface SubscriptionRepository extends JpaRepository<Subscription, UUID> {
     @org.springframework.data.jpa.repository.Modifying
+    @org.springframework.data.jpa.repository.Query("DELETE FROM Subscription s WHERE s.tenantId = :tenantId")
     void deleteByTenantId(UUID tenantId);
 }

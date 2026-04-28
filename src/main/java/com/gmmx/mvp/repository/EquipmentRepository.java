@@ -11,5 +11,6 @@ public interface EquipmentRepository extends JpaRepository<Equipment, UUID> {
     java.util.List<Equipment> findAllByTenantId(UUID tenantId);
     java.util.Optional<Equipment> findByIdAndTenantId(UUID id, UUID tenantId);
     @org.springframework.data.jpa.repository.Modifying
+    @org.springframework.data.jpa.repository.Query("DELETE FROM Equipment e WHERE e.tenantId = :tenantId")
     void deleteByTenantId(UUID tenantId);
 }

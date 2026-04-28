@@ -92,14 +92,14 @@ public class SuperAdminService {
 
     @Transactional
     public void deleteGym(UUID tenantId) {
-        // Delete all associated data
+        // Delete all associated data in correct order to respect FK constraints
         attendanceRepository.deleteByTenantId(tenantId);
         equipmentRepository.deleteByTenantId(tenantId);
         refreshTokenRepository.deleteByTenantId(tenantId);
         subscriptionRepository.deleteByTenantId(tenantId);
-        userAccountRepository.deleteByTenantId(tenantId);
         memberProfileRepository.deleteByTenantId(tenantId);
         trainerProfileRepository.deleteByTenantId(tenantId);
+        userAccountRepository.deleteByTenantId(tenantId);
         membershipPlanRepository.deleteByTenantId(tenantId);
         
         // Delete tenant itself
