@@ -52,7 +52,7 @@ public class SuperAdminController {
             superAdminService.deleteGym(UUID.fromString(id));
             return ApiResponse.success(null, "Gym deleted successfully");
         } catch (IllegalArgumentException e) {
-            return ApiResponse.error("Invalid Gym ID format", 400);
+            return ApiResponse.error("Invalid Gym ID format");
         }
     }
 
