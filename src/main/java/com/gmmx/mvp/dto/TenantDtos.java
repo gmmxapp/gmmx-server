@@ -17,5 +17,8 @@ public class TenantDtos {
         private String logoUrl;
         private String address;
         private String contactPhone;
+        private boolean hasMicrosite;
+        private String about;
+        private String themePrimary;
     }
 }

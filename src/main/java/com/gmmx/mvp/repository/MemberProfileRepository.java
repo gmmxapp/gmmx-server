@@ -9,4 +9,5 @@ import java.util.UUID;
 @Repository
 public interface MemberProfileRepository extends JpaRepository<MemberProfile, UUID> {
     java.util.Optional<MemberProfile> findByUserId(UUID userId);
+    java.util.Optional<MemberProfile> findByIdAndTenantId(UUID id, UUID tenantId);
 }

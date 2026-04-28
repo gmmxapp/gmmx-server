@@ -33,4 +33,8 @@ public class MemberProfile extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "assigned_trainer_id")
     private TrainerProfile assignedTrainer;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "membership_plan_id")
+    private MembershipPlan membershipPlan;
 }

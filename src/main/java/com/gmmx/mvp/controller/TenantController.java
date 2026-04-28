@@ -27,6 +27,9 @@ public class TenantController {
                 .logoUrl(tenant.getLogoUrl())
                 .address(tenant.getAddress())
                 .contactPhone(tenant.getContactMobileNumber())
+                .hasMicrosite(tenant.isHasMicrosite())
+                .about(tenant.getAbout())
+                .themePrimary(tenant.getThemePrimary() != null ? tenant.getThemePrimary() : "#ef4444")
                 .build();
 
         return ApiResponse.success(response, "Gym found");

@@ -50,6 +50,9 @@ public class Tenant {
     @Column(nullable = false)
     private boolean hasMicrosite = false;
 
+    private String about;
+    private String themePrimary = "#ef4444"; // Default red-500
+
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
