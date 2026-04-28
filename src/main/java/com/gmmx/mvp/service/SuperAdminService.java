@@ -6,6 +6,7 @@ import com.gmmx.mvp.repository.UserAccountRepository;
 import com.gmmx.mvp.dto.AuthDtos;
 import com.gmmx.mvp.mapper.UserMapper;
 import com.gmmx.mvp.entity.UserAccount;
+import com.gmmx.mvp.repository.*;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,6 +23,9 @@ public class SuperAdminService {
 
     private final TenantRepository tenantRepository;
     private final UserAccountRepository userAccountRepository;
+    private final MemberProfileRepository memberProfileRepository;
+    private final TrainerProfileRepository trainerProfileRepository;
+    private final MembershipPlanRepository membershipPlanRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
@@ -80,6 +84,18 @@ public class SuperAdminService {
         
         user = userAccountRepository.save(user);
         return userMapper.toResponse(user);
+    }
+
+    @Transactional
+    public void deleteGym(UUID tenantId) {
+        // Delete all associated data
+        userAccountRepository.deleteByTenantId(tenantId);
+        memberProfileRepository.deleteByTenantId(tenantId);
+        trainerProfileRepository.deleteByTenantId(tenantId);
+        membershipPlanRepository.deleteByTenantId(tenantId);
+        
+        // Delete tenant itself
+        tenantRepository.deleteById(tenantId);
     }
 
     @Transactional

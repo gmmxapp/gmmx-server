@@ -44,6 +44,14 @@ public class SuperAdminController {
         return ApiResponse.success(superAdminService.addUserToGym(id, request), "User added successfully");
     }
 
+    @DeleteMapping("/gyms/{id}")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @Operation(summary = "Delete Gym", description = "Permanently removes a gym and ALL its associated data (users, members, equipment, etc.).")
+    public ApiResponse<Void> deleteGym(@PathVariable UUID id) {
+        superAdminService.deleteGym(id);
+        return ApiResponse.success(null, "Gym deleted successfully");
+    }
+
     @PutMapping("/users/{userId}/reset-pin")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     @Operation(summary = "Reset User PIN", description = "Changes the 4-digit PIN for a user.")
