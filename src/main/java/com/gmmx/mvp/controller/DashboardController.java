@@ -42,7 +42,7 @@ public class DashboardController {
             
             if (tenantId == null) {
                 log.warn("No tenant ID found in context");
-                return ApiResponse.error("No tenant context found", 401);
+                return ApiResponse.error("No tenant context found");
             }
 
             long totalMembers = memberRepository.countByTenantId(tenantId);
@@ -66,7 +66,7 @@ public class DashboardController {
             return ApiResponse.success(stats, "Stats retrieved successfully");
         } catch (Exception e) {
             log.error("Error fetching dashboard stats", e);
-            return ApiResponse.error("Failed to fetch dashboard stats: " + e.getMessage(), 500);
+            return ApiResponse.error("Failed to fetch dashboard stats: " + e.getMessage());
         }
     }
 }
