@@ -12,15 +12,19 @@ public class DashboardDtos {
     @Data
     @Builder
     public static class OwnerDashboardStats {
-        private long totalMembers;
-        private long activeMembers;
-        private long newLeadsToday;
-        private long totalLeads;
-        private BigDecimal monthlyRevenue;
-        private BigDecimal monthlyExpenses;
+        private String totalMembers;
+        private String activeMembers;
+        private String activeTrainers;
+        private String newLeadsToday;
+        private String totalLeads;
+        private String monthlyRevenue;
+        private String monthlyExpenses;
         private List<MonthlyData> revenueTrend;
+        private List<DailyRevenue> weeklyRevenue; // Match Flutter
+        private String totalWeeklyRevenue; // Match Flutter
         private Map<String, Long> membershipDistribution;
         private long attendanceToday;
+        private String newMembersThisMonth; // Match Flutter
     }
 
     @Data

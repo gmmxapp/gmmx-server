@@ -50,17 +50,30 @@ public class DashboardController {
             long totalLeads = leadRepository.countByTenantId(tenantId);
             log.info("Total leads: {}", totalLeads);
             
+            // Format numbers as Strings for Flutter
+            String totalMembersStr = String.valueOf(totalMembers);
+            String activeTrainersStr = "0"; // To be implemented
+            String monthlyRevenueStr = "₹55,000";
+            String monthlyExpensesStr = "₹12,000";
+            String totalLeadsStr = String.valueOf(totalLeads);
+            String newLeadsTodayStr = "0";
+            String newMembersThisMonthStr = "+0";
+
             // Mocking some data for trend until we have enough real records
             DashboardDtos.OwnerDashboardStats stats = DashboardDtos.OwnerDashboardStats.builder()
-                    .totalMembers(totalMembers)
-                    .activeMembers(totalMembers)
-                    .totalLeads(totalLeads)
-                    .newLeadsToday(0)
-                    .monthlyRevenue(new BigDecimal("55000"))
-                    .monthlyExpenses(new BigDecimal("12000"))
+                    .totalMembers(totalMembersStr)
+                    .activeMembers(totalMembersStr)
+                    .activeTrainers(activeTrainersStr)
+                    .totalLeads(totalLeadsStr)
+                    .newLeadsToday(newLeadsTodayStr)
+                    .monthlyRevenue(monthlyRevenueStr)
+                    .monthlyExpenses(monthlyExpensesStr)
+                    .newMembersThisMonth(newMembersThisMonthStr)
                     .attendanceToday(24)
                     .revenueTrend(new ArrayList<>())
-                    .membershipDistribution(new java.util.HashMap<>()) // Initialize to avoid null
+                    .weeklyRevenue(new ArrayList<>())
+                    .totalWeeklyRevenue(monthlyRevenueStr)
+                    .membershipDistribution(new java.util.HashMap<>())
                     .build();
                     
             return ApiResponse.success(stats, "Stats retrieved successfully");
