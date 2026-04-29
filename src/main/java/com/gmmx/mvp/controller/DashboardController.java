@@ -39,7 +39,8 @@ public class DashboardController {
         try {
             UUID tenantId = TenantContext.getTenantId();
             log.info("Tenant ID: {}", tenantId);
-            log.info("User authorities: {}", org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getAuthorities());
+            var auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+            log.info("User authorities: {}", auth != null ? auth.getAuthorities() : "NULL");
             
             if (tenantId == null) {
                 log.warn("No tenant ID found in context");
