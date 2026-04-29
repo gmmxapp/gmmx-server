@@ -48,9 +48,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            var userOpt = tenantIdFromToken != null 
+            java.util.Optional<com.gmmx.mvp.entity.UserAccount> userOpt = tenantIdFromToken != null 
                 ? userAccountRepository.findByEmailAndTenantId(userEmail, tenantIdFromToken)
-                : java.util.Optional.ofNullable(null); // Fallback to userDetailsService if needed
+                : java.util.Optional.empty();
 
             if (userOpt.isPresent()) {
                 UserDetails userDetails = userOpt.get();
