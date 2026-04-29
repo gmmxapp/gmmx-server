@@ -36,26 +36,37 @@ public class DashboardController {
     @PreAuthorize("hasRole('OWNER')")
     public ApiResponse<DashboardDtos.OwnerDashboardStats> getOwnerStats() {
         log.info("Fetching dashboard stats for owner");
-        UUID tenantId = TenantContext.getTenantId();
-        log.info("Tenant ID: {}", tenantId);
-        
-        long totalMembers = memberRepository.countByTenantId(tenantId);
-        log.info("Total members: {}", totalMembers);
-        long totalLeads = leadRepository.countByTenantId(tenantId);
-        log.info("Total leads: {}", totalLeads);
-        
-        // Mocking some data for trend until we have enough real records
-        DashboardDtos.OwnerDashboardStats stats = DashboardDtos.OwnerDashboardStats.builder()
-                .totalMembers(totalMembers)
-                .activeMembers(totalMembers) // Simplification
-                .totalLeads(totalLeads)
-                .newLeadsToday(0)
-                .monthlyRevenue(new BigDecimal("55000"))
-                .monthlyExpenses(new BigDecimal("12000"))
-                .attendanceToday(24)
-                .revenueTrend(new ArrayList<>())
-                .build();
-                
-        return ApiResponse.success(stats, "Stats retrieved successfully");
+        try {
+            UUID tenantId = TenantContext.getTenantId();
+            log.info("Tenant ID: {}", tenantId);
+            
+            if (tenantId == null) {
+                log.warn("No tenant ID found in context");
+                return ApiResponse.error("No tenant context found", 401);
+            }
+
+            long totalMembers = memberRepository.countByTenantId(tenantId);
+            log.info("Total members: {}", totalMembers);
+            long totalLeads = leadRepository.countByTenantId(tenantId);
+            log.info("Total leads: {}", totalLeads);
+            
+            // Mocking some data for trend until we have enough real records
+            DashboardDtos.OwnerDashboardStats stats = DashboardDtos.OwnerDashboardStats.builder()
+                    .totalMembers(totalMembers)
+                    .activeMembers(totalMembers)
+                    .totalLeads(totalLeads)
+                    .newLeadsToday(0)
+                    .monthlyRevenue(new BigDecimal("55000"))
+                    .monthlyExpenses(new BigDecimal("12000"))
+                    .attendanceToday(24)
+                    .revenueTrend(new ArrayList<>())
+                    .membershipDistribution(new java.util.HashMap<>()) // Initialize to avoid null
+                    .build();
+                    
+            return ApiResponse.success(stats, "Stats retrieved successfully");
+        } catch (Exception e) {
+            log.error("Error fetching dashboard stats", e);
+            return ApiResponse.error("Failed to fetch dashboard stats: " + e.getMessage(), 500);
+        }
     }
 }
