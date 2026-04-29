@@ -33,7 +33,7 @@ public class DashboardController {
     private final PaymentRepository paymentRepository;
 
     @GetMapping("/owner/stats")
-    @PreAuthorize("isAuthenticated()")
+    // @PreAuthorize("isAuthenticated()")
     public ApiResponse<DashboardDtos.OwnerDashboardStats> getOwnerStats() {
         log.info("Fetching dashboard stats for owner");
         try {
