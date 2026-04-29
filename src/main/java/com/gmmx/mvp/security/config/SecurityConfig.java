@@ -47,7 +47,8 @@ public class SecurityConfig {
                     "/swagger-ui.html",
                     "/logo-gmmx.png",
                     "/static/**",
-                    "/favicon.ico"
+                    "/favicon.ico",
+                    "/api/dashboard/**"
                 ).permitAll()
                 .anyRequest().authenticated()
             )
