@@ -32,7 +32,7 @@ public class DashboardController {
     private final ExpenseRepository expenseRepository;
     private final PaymentRepository paymentRepository;
 
-    @GetMapping("/owner")
+    @GetMapping("/owner/stats")
     @PreAuthorize("hasRole('OWNER')")
     public ApiResponse<DashboardDtos.OwnerDashboardStats> getOwnerStats() {
         log.info("Fetching dashboard stats for owner");
