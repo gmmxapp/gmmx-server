@@ -9,6 +9,7 @@ import com.gmmx.mvp.repository.PaymentRepository;
 import com.gmmx.mvp.core.tenant.TenantContext;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,7 @@ import java.util.UUID;
 @RequestMapping("/api/dashboard")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "BearerAuth")
+@Slf4j
 public class DashboardController {
 
     private final MemberProfileRepository memberRepository;
@@ -33,10 +35,14 @@ public class DashboardController {
     @GetMapping("/owner")
     @PreAuthorize("hasRole('OWNER')")
     public ApiResponse<DashboardDtos.OwnerDashboardStats> getOwnerStats() {
+        log.info("Fetching dashboard stats for owner");
         UUID tenantId = TenantContext.getTenantId();
+        log.info("Tenant ID: {}", tenantId);
         
         long totalMembers = memberRepository.countByTenantId(tenantId);
+        log.info("Total members: {}", totalMembers);
         long totalLeads = leadRepository.countByTenantId(tenantId);
+        log.info("Total leads: {}", totalLeads);
         
         // Mocking some data for trend until we have enough real records
         DashboardDtos.OwnerDashboardStats stats = DashboardDtos.OwnerDashboardStats.builder()
