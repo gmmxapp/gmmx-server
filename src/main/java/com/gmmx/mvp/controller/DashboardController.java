@@ -33,12 +33,13 @@ public class DashboardController {
     private final PaymentRepository paymentRepository;
 
     @GetMapping("/owner/stats")
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("isAuthenticated()")
     public ApiResponse<DashboardDtos.OwnerDashboardStats> getOwnerStats() {
         log.info("Fetching dashboard stats for owner");
         try {
             UUID tenantId = TenantContext.getTenantId();
             log.info("Tenant ID: {}", tenantId);
+            log.info("User authorities: {}", org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getAuthorities());
             
             if (tenantId == null) {
                 log.warn("No tenant ID found in context");
