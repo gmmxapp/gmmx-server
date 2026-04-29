@@ -40,23 +40,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         jwt = authHeader.substring(7);
         userEmail = jwtUtils.extractUsername(jwt);
-        UUID tenantId = jwtUtils.extractTenantId(jwt);
+        UUID tenantIdFromToken = jwtUtils.extractTenantId(jwt);
+
+        // Always set TenantContext if we have a tenantId in the token
+        if (tenantIdFromToken != null) {
+            TenantContext.setTenantId(tenantIdFromToken);
+        }
 
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails;
-            if (tenantId != null) {
-                userDetails = userAccountRepository.findByEmailAndTenantId(userEmail, tenantId)
+            if (tenantIdFromToken != null) {
+                userDetails = userAccountRepository.findByEmailAndTenantId(userEmail, tenantIdFromToken)
                         .orElseThrow(() -> new org.springframework.security.core.userdetails.UsernameNotFoundException("User not found in tenant"));
             } else {
                 userDetails = this.userDetailsService.loadUserByUsername(userEmail);
             }
             
             if (jwtUtils.isTokenValid(jwt, userDetails)) {
-                // Critical: Inject tenantId from JWT into TenantContext
-                if (tenantId != null) {
-                    TenantContext.setTenantId(tenantId);
-                }
-
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities()
                 );

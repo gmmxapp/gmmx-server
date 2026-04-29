@@ -3,32 +3,32 @@ package com.gmmx.mvp.dto;
 import lombok.Builder;
 import lombok.Data;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+
+@Data
+@Builder
 public class DashboardDtos {
 
     @Data
     @Builder
-    public static class OwnerStatsResponse {
-        private String totalMembers;
-        private String activeTrainers;
-        private String monthlyRevenue;
-        private String newMembersThisMonth;
-        private java.util.List<DailyRevenue> weeklyRevenue;
-        private String totalWeeklyRevenue;
+    public static class OwnerDashboardStats {
+        private long totalMembers;
+        private long activeMembers;
+        private long newLeadsToday;
+        private long totalLeads;
+        private BigDecimal monthlyRevenue;
+        private BigDecimal monthlyExpenses;
+        private List<MonthlyData> revenueTrend;
+        private Map<String, Long> membershipDistribution;
+        private long attendanceToday;
     }
 
     @Data
     @Builder
-    public static class DailyRevenue {
-        private String day; // Mon, Tue, etc.
-        private double amount;
-    }
-
-    @Data
-    @Builder
-    public static class RecentActivityResponse {
-        private String title;
-        private String subtitle;
-        private String icon; // people, payment, fitness, etc.
-        private String time;
+    public static class MonthlyData {
+        private String month;
+        private BigDecimal value;
     }
 }

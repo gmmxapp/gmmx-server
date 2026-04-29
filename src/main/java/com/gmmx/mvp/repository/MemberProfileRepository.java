@@ -13,4 +13,6 @@ public interface MemberProfileRepository extends JpaRepository<MemberProfile, UU
     @org.springframework.data.jpa.repository.Modifying
     @org.springframework.data.jpa.repository.Query("DELETE FROM MemberProfile m WHERE m.tenantId = :tenantId")
     void deleteByTenantId(UUID tenantId);
+
+    long countByTenantId(UUID tenantId);
 }
