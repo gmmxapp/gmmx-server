@@ -9,6 +9,8 @@ import com.gmmx.mvp.repository.AttendanceRepository;
 import com.gmmx.mvp.repository.MemberProfileRepository;
 import com.gmmx.mvp.repository.TrainerProfileRepository;
 import com.gmmx.mvp.repository.UserAccountRepository;
+import com.gmmx.mvp.entity.UserAccount;
+import com.gmmx.mvp.entity.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
