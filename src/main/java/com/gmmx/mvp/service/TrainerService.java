@@ -123,6 +123,8 @@ public class TrainerService {
         response.setEmail(account.getEmail());
         response.setMobile(account.getMobile());
         response.setActive(account.isEnabled());
+        response.setStatus(account.isEnabled() ? "active" : "inactive");
+        response.setRole(account.getRole().name());
         // Populate permissions from TrainerProfile
         trainerProfileRepository.findByUserId(account.getId()).ifPresent(profile ->
             response.setPermissions(profile.getPermissions())

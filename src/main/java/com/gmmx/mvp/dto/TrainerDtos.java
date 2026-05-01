@@ -37,6 +37,8 @@ public class TrainerDtos {
         private String email;
         private String mobile;
         private boolean active;
+        private String status; // For frontend compatibility
+        private String role;   // For frontend compatibility
         private String permissions;
     }
 }
