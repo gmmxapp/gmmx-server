@@ -32,8 +32,9 @@ public class ChatController {
     @GetMapping("/conversation/{userId}")
     @Operation(summary = "Get conversation with a user")
     public ApiResponse<Page<ChatDtos.ChatMessageResponse>> getConversation(
-            @PathVariable("userId") UUID userId,
-            @org.springframework.data.web.PageableDefault(size = 50, sort = "createdAt", direction = org.springframework.data.domain.Sort.Direction.DESC) org.springframework.data.domain.Pageable pageable) {
+            @PathVariable UUID userId,
+            org.springframework.data.domain.Pageable pageable) {
+        log.info("Fetching conversation for user: {}", userId);
         return ApiResponse.success(chatService.getConversation(userId, pageable), "Conversation retrieved");
     }
 }

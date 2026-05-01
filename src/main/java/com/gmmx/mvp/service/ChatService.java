@@ -80,6 +80,14 @@ public class ChatService {
         UserAccount currentUser = userRepository.findByEmailAndTenantId(currentUserEmail, TenantContext.getTenantId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
+        if (pageable == null || pageable.getSort().isUnsorted()) {
+            pageable = org.springframework.data.domain.PageRequest.of(
+                pageable != null ? pageable.getPageNumber() : 0,
+                pageable != null ? pageable.getPageSize() : 20,
+                org.springframework.data.domain.Sort.by("createdAt").descending()
+            );
+        }
+
         return chatRepository.findConversation(currentUser.getId(), otherUserId, pageable)
                 .map(this::toResponse);
     }
