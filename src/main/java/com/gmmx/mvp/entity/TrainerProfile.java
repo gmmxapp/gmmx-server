@@ -20,6 +20,7 @@ public class TrainerProfile extends BaseEntity {
     private String specialization;
     private Integer experienceYears;
 
+    @org.hibernate.annotations.JdbcTypeCode(org.hibernate.type.SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     private String availability;
 
