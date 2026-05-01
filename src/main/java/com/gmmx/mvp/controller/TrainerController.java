@@ -69,6 +69,14 @@ public class TrainerController {
     public ApiResponse<TrainerDtos.TrainerResponse> updatePermissions(
             @PathVariable UUID id,
             @RequestBody TrainerDtos.PermissionsUpdateRequest request) {
-        return ApiResponse.success(trainerService.updateTrainerPermissions(id, request), "Trainer permissions updated");
+        log.info("Updating permissions for trainer [{}]: {}", id, request.getPermissions());
+        try {
+            TrainerDtos.TrainerResponse response = trainerService.updateTrainerPermissions(id, request);
+            log.info("Permissions updated successfully for trainer [{}]", id);
+            return ApiResponse.success(response, "Trainer permissions updated");
+        } catch (Exception e) {
+            log.error("Error updating trainer permissions", e);
+            return ApiResponse.error("Failed to update permissions: " + e.getMessage());
+        }
     }
 }
