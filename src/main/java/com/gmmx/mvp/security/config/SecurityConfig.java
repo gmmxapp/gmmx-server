@@ -49,7 +49,8 @@ public class SecurityConfig {
                     "/logo-gmmx.png",
                     "/static/**",
                     "/favicon.ico",
-                    "/api/dashboard/**"
+                    "/api/dashboard/**",
+                    "/api/chat/**"
                 ).permitAll()
                 .anyRequest().authenticated()
             )
