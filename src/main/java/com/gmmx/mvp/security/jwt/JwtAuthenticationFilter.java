@@ -50,20 +50,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             java.util.Optional<com.gmmx.mvp.entity.UserAccount> userOpt = tenantIdFromToken != null 
                 ? userAccountRepository.findByEmailAndTenantId(userEmail, tenantIdFromToken)
-                : java.util.Optional.empty();
+                : userAccountRepository.findByEmail(userEmail);
 
             if (userOpt.isPresent()) {
                 UserDetails userDetails = userOpt.get();
-                if (jwtUtils.isTokenValid(jwt, userDetails)) {
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            userDetails, null, userDetails.getAuthorities()
-                    );
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
-                }
-            } else if (tenantIdFromToken == null) {
-                // Fallback for global admin or tokens without tenantId
-                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
                 if (jwtUtils.isTokenValid(jwt, userDetails)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails, null, userDetails.getAuthorities()

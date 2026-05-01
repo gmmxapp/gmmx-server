@@ -25,7 +25,6 @@ public class DashboardController {
     private final DashboardService dashboardService;
 
     @GetMapping("/owner/stats")
-    @PreAuthorize("isAuthenticated()")
     public ApiResponse<DashboardDtos.OwnerStatsResponse> getOwnerStats() {
         log.info("Fetching real dashboard stats for owner");
         try {
@@ -38,7 +37,6 @@ public class DashboardController {
     }
 
     @GetMapping("/recent-activity")
-    @PreAuthorize("isAuthenticated()")
     public ApiResponse<List<DashboardDtos.RecentActivityResponse>> getRecentActivity() {
         try {
             return ApiResponse.success(dashboardService.getRecentActivity(), "Recent activity retrieved");
@@ -49,7 +47,6 @@ public class DashboardController {
     }
 
     @GetMapping("/client/stats")
-    @PreAuthorize("hasRole('MEMBER') or hasRole('CLIENT')")
     public ApiResponse<DashboardDtos.ClientStatsResponse> getClientStats(@AuthenticationPrincipal UserAccount user) {
         log.info("Fetching real dashboard stats for member: {}", user.getEmail());
         try {
