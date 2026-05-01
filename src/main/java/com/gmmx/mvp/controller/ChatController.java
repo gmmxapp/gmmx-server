@@ -28,6 +28,8 @@ public class ChatController {
     @PostMapping("/send")
     @Operation(summary = "Send a message")
     public ApiResponse<ChatDtos.ChatMessageResponse> sendMessage(@Valid @RequestBody ChatDtos.ChatMessageRequest request) {
+        log.info("Sending message to recipient: {}", request.getRecipientId());
+        log.debug("Message content: {}", request.getMessage());
         return ApiResponse.success(chatService.sendMessage(request), "Message sent");
     }
 

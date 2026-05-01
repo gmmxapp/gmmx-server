@@ -9,6 +9,7 @@ import com.gmmx.mvp.exception.ResourceNotFoundException;
 import com.gmmx.mvp.repository.ChatMessageRepository;
 import com.gmmx.mvp.repository.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,6 +20,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ChatService {
 
     private final ChatMessageRepository chatRepository;
@@ -28,18 +30,27 @@ public class ChatService {
     @Transactional
     public ChatDtos.ChatMessageResponse sendMessage(ChatDtos.ChatMessageRequest request) {
         String senderEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        log.info("Message attempt by sender: {} to recipient: {}", senderEmail, request.getRecipientId());
+        
         UserAccount sender = userRepository.findByEmailAndTenantId(senderEmail, TenantContext.getTenantId())
-                .orElseThrow(() -> new ResourceNotFoundException("Sender not found"));
+                .orElseThrow(() -> {
+                    log.error("Sender not found in tenant: {} for email: {}", TenantContext.getTenantId(), senderEmail);
+                    return new ResourceNotFoundException("Sender not found");
+                });
 
         UUID recipientId;
         try {
             recipientId = UUID.fromString(request.getRecipientId());
         } catch (IllegalArgumentException e) {
+            log.error("Invalid recipient ID format: {}", request.getRecipientId());
             throw new BadRequestException("Invalid recipient ID format: " + request.getRecipientId());
         }
 
         UserAccount recipient = userRepository.findById(recipientId)
-                .orElseThrow(() -> new ResourceNotFoundException("Recipient not found"));
+                .orElseThrow(() -> {
+                    log.error("Recipient not found for ID: {}", recipientId);
+                    return new ResourceNotFoundException("Recipient not found");
+                });
 
         // Ensure both users belong to the same tenant (simple check)
         if (!sender.getTenantId().equals(recipient.getTenantId())) {
