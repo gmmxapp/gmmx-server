@@ -12,7 +12,7 @@ public class ChatDtos {
     @Data
     public static class ChatMessageRequest {
         @NotNull
-        private UUID recipientId;
+        private String recipientId;
         @NotBlank
         private String message;
     }

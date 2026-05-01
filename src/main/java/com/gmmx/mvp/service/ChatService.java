@@ -4,6 +4,7 @@ import com.gmmx.mvp.core.tenant.TenantContext;
 import com.gmmx.mvp.dto.ChatDtos;
 import com.gmmx.mvp.entity.ChatMessage;
 import com.gmmx.mvp.entity.UserAccount;
+import com.gmmx.mvp.exception.BadRequestException;
 import com.gmmx.mvp.exception.ResourceNotFoundException;
 import com.gmmx.mvp.repository.ChatMessageRepository;
 import com.gmmx.mvp.repository.UserAccountRepository;
@@ -26,11 +27,18 @@ public class ChatService {
 
     @Transactional
     public ChatDtos.ChatMessageResponse sendMessage(ChatDtos.ChatMessageRequest request) {
-        String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        UserAccount sender = userRepository.findByEmailAndTenantId(currentUserEmail, TenantContext.getTenantId())
+        String senderEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserAccount sender = userRepository.findByEmailAndTenantId(senderEmail, TenantContext.getTenantId())
                 .orElseThrow(() -> new ResourceNotFoundException("Sender not found"));
 
-        UserAccount recipient = userRepository.findById(request.getRecipientId())
+        UUID recipientId;
+        try {
+            recipientId = UUID.fromString(request.getRecipientId());
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Invalid recipient ID format: " + request.getRecipientId());
+        }
+
+        UserAccount recipient = userRepository.findById(recipientId)
                 .orElseThrow(() -> new ResourceNotFoundException("Recipient not found"));
 
         // Ensure both users belong to the same tenant (simple check)
