@@ -134,17 +134,32 @@ public class DashboardService {
 
     public DashboardDtos.ClientStatsResponse getClientStats(UserAccount currentUser) {
         MemberProfile profile = memberProfileRepository.findByUserId(currentUser.getId())
-                .orElseThrow(() -> new RuntimeException("Member profile not found"));
+                .orElse(null);
+
+        if (profile == null) {
+            return DashboardDtos.ClientStatsResponse.builder()
+                    .planName("No Active Plan")
+                    .expiryDate("N/A")
+                    .totalVisits(0)
+                    .calories(0)
+                    .todayWorkout(new ArrayList<>())
+                    .trainerName("No Trainer Assigned")
+                    .trainerSpecialty("N/A")
+                    .attendanceStreak(new ArrayList<>())
+                    .steps(0)
+                    .stepGoal(10000)
+                    .build();
+        }
 
         List<Attendance> attendanceHistory = attendanceRepository.findByMemberIdOrderByDateDesc(profile.getId());
-        int totalVisits = attendanceHistory.size();
+        int totalVisits = attendanceHistory != null ? attendanceHistory.size() : 0;
 
         // Calculate attendance streak (last 7 days)
         List<DashboardDtos.AttendanceDayResponse> streak = new ArrayList<>();
         LocalDate now = LocalDate.now();
         for (int i = 6; i >= 0; i--) {
             LocalDate date = now.minusDays(i);
-            boolean present = attendanceHistory.stream().anyMatch(a -> a.getDate().equals(date));
+            boolean present = attendanceHistory != null && attendanceHistory.stream().anyMatch(a -> a.getDate().equals(date));
             streak.add(DashboardDtos.AttendanceDayResponse.builder()
                     .day(date.getDayOfWeek().name().substring(0, 3))
                     .present(present)
@@ -152,8 +167,8 @@ public class DashboardService {
         }
 
         TrainerProfile trainer = profile.getAssignedTrainer();
-        String trainerId = trainer != null ? trainer.getUser().getId().toString() : null;
-        String trainerName = trainer != null ? trainer.getUser().getFullName() : "No Trainer Assigned";
+        String trainerId = (trainer != null && trainer.getUser() != null) ? trainer.getUser().getId().toString() : null;
+        String trainerName = (trainer != null && trainer.getUser() != null) ? trainer.getUser().getFullName() : "No Trainer Assigned";
         String trainerSpecialty = "Personal Coach"; // Fallback
 
         // Mock workout for now (linked to future module)
