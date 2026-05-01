@@ -94,15 +94,24 @@ public class AuthService {
                 .orElseThrow(() -> new RuntimeException("Gym not found: " + request.getGymId()));
 
         // 2. Normalize Identifier
-        String identifier = com.gmmx.mvp.util.PhoneUtils.normalizeIdentifier(request.getIdentifier());
-
+        String originalIdentifier = request.getIdentifier();
+        String identifier = com.gmmx.mvp.util.PhoneUtils.normalizeIdentifier(originalIdentifier);
+        log.info("Login attempt - Original: [{}], Normalized: [{}], GymId: [{}]", originalIdentifier, identifier, request.getGymId());
+        
         // 3. Find User
         // First try finding user in the specific tenant
         UserAccount user = userAccountRepository.findByEmailOrMobileNumberAndTenantId(identifier, identifier, tenant.getId())
                 .orElseGet(() -> {
+                    log.info("User [{}] not found in tenant [{}]. Searching globally...", identifier, tenant.getSubdomain());
                     // If not found, check globally to see if this user belongs to another gym
                     UserAccount globalUser = userAccountRepository.findByEmailOrMobileNumber(identifier, identifier)
-                            .orElseThrow(() -> new RuntimeException("User not found in this system. Check your credentials."));
+                            .orElseThrow(() -> {
+                                log.warn("Global lookup failed for identifier: [{}] after trying tenant: [{}]", identifier, tenant.getId());
+                                return new RuntimeException("User not found in this system. Check your credentials.");
+                            });
+                    
+                    log.info("User [{}] found globally with role [{}]. Correct tenant: [{}]", 
+                            identifier, globalUser.getRole(), globalUser.getTenantId());
                     
                     // Allow Owners and Trainers to log into their correct tenant even if they started from the wrong gym ID
                     if (globalUser.getRole() == UserRole.OWNER || globalUser.getRole() == UserRole.TRAINER || globalUser.getRole() == UserRole.SUPER_ADMIN) {

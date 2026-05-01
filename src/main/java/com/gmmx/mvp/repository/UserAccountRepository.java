@@ -11,7 +11,10 @@ import java.util.UUID;
 public interface UserAccountRepository extends JpaRepository<UserAccount, UUID> {
     Optional<UserAccount> findByEmail(String email);
     Optional<UserAccount> findByEmailAndTenantId(String email, UUID tenantId);
-    Optional<UserAccount> findByEmailOrMobileNumber(String email, String mobileNumber);
+    @org.springframework.data.jpa.repository.Query("SELECT u FROM UserAccount u WHERE u.email = :email OR u.mobileNumber = :mobileNumber")
+    Optional<UserAccount> findByEmailOrMobileNumber(
+            @org.springframework.data.repository.query.Param("email") String email, 
+            @org.springframework.data.repository.query.Param("mobileNumber") String mobileNumber);
 
     @org.springframework.data.jpa.repository.Query("SELECT u FROM UserAccount u WHERE (u.email = :email OR u.mobileNumber = :mobileNumber) AND u.tenantId = :tenantId")
     Optional<UserAccount> findByEmailOrMobileNumberAndTenantId(

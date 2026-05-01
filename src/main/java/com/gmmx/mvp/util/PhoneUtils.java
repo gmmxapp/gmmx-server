@@ -12,12 +12,10 @@ public class PhoneUtils {
         }
 
         // Strip everything except digits for phone numbers
-        normalized = normalized.replaceAll("[^\\d+]", "");
+        normalized = normalized.replaceAll("[^\\d]", "");
 
-        // Handle Indian mobile numbers
-        if (normalized.startsWith("+91")) {
-            normalized = normalized.substring(3);
-        } else if (normalized.startsWith("91") && normalized.length() == 12) {
+        // Handle Indian mobile numbers (12 digits starting with 91, or 11 starting with 0)
+        if (normalized.startsWith("91") && normalized.length() == 12) {
             normalized = normalized.substring(2);
         } else if (normalized.startsWith("0") && normalized.length() == 11) {
             normalized = normalized.substring(1);
