@@ -11,7 +11,18 @@ import org.hibernate.envers.Audited;
 @Entity
 @Table(name = "chat_messages")
 @Audited
-public class ChatMessage extends BaseEntity {
+@EntityListeners({org.springframework.data.jpa.domain.support.AuditingEntityListener.class, com.gmmx.mvp.core.entity.TenantEntityListener.class})
+public class ChatMessage {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private java.util.UUID id;
+
+    @Column(name = "tenant_id", nullable = false, updatable = false)
+    private java.util.UUID tenantId;
+
+    @org.springframework.data.annotation.CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private java.time.LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id", nullable = false)
