@@ -32,14 +32,16 @@ public class TrainerService {
         UserAccount trainer = new UserAccount();
         trainer.setFullName(request.getFullName());
         trainer.setEmail(request.getEmail());
-        trainer.setMobile(request.getMobile());
+        // Normalize mobile number before saving
+        String normalizedMobile = com.gmmx.mvp.util.PhoneUtils.normalizeIdentifier(request.getMobile());
+        trainer.setMobile(normalizedMobile);
         trainer.setRole(UserRole.TRAINER);
         
         // Use provided PIN or fallback to last 4 digits of mobile
         String initialPin = request.getPin();
         if (initialPin == null || initialPin.isEmpty()) {
-            if (request.getMobile() != null && request.getMobile().length() >= 4) {
-                initialPin = request.getMobile().substring(request.getMobile().length() - 4);
+            if (normalizedMobile != null && normalizedMobile.length() >= 4) {
+                initialPin = normalizedMobile.substring(normalizedMobile.length() - 4);
             } else {
                 initialPin = "1234"; // Absolute fallback
             }
@@ -69,7 +71,9 @@ public class TrainerService {
 
         if (request.getFullName() != null) trainer.setFullName(request.getFullName());
         if (request.getEmail() != null) trainer.setEmail(request.getEmail());
-        if (request.getMobile() != null) trainer.setMobile(request.getMobile());
+        if (request.getMobile() != null) {
+            trainer.setMobile(com.gmmx.mvp.util.PhoneUtils.normalizeIdentifier(request.getMobile()));
+        }
         if (request.getActive() != null) trainer.setActive(request.getActive());
 
         trainer = userAccountRepository.save(trainer);
