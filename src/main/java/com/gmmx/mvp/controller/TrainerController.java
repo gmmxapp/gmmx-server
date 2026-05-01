@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,6 +21,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Tag(name = "Admin - Trainers", description = "Trainer management for gym owners")
 @SecurityRequirement(name = "BearerAuth")
+@Slf4j
 public class TrainerController {
 
     private final TrainerService trainerService;
@@ -50,7 +52,15 @@ public class TrainerController {
     @PreAuthorize("hasAnyRole('OWNER', 'SUPER_ADMIN')")
     @Operation(summary = "List all Trainers", description = "Returns a paginated list of all trainers in the current gym.")
     public ApiResponse<Page<TrainerDtos.TrainerResponse>> getAll(Pageable pageable) {
-        return ApiResponse.success(trainerService.getAllTrainers(pageable), "Trainers retrieved successfully");
+        log.info("Fetching trainers list with pageable: {}", pageable);
+        try {
+            Page<TrainerDtos.TrainerResponse> trainers = trainerService.getAllTrainers(pageable);
+            log.info("Found {} trainers", trainers.getTotalElements());
+            return ApiResponse.success(trainers, "Trainers retrieved successfully");
+        } catch (Exception e) {
+            log.error("Error fetching trainers", e);
+            throw e;
+        }
     }
 
     @PutMapping("/{id}/permissions")
