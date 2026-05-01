@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Tag(name = "Messaging", description = "Endpoints for in-app chat")
 @SecurityRequirement(name = "BearerAuth")
+@Slf4j
 public class ChatController {
 
     private final ChatService chatService;
