@@ -53,15 +53,23 @@ public class ChatService {
                 });
 
         // Ensure both users belong to the same tenant (simple check)
+        if (sender.getTenantId() == null || recipient.getTenantId() == null) {
+            log.error("Missing tenant ID. Sender tenant: {}, Recipient tenant: {}", sender.getTenantId(), recipient.getTenantId());
+            throw new BadRequestException("Tenant assignment missing for one of the users");
+        }
+
         if (!sender.getTenantId().equals(recipient.getTenantId())) {
-             throw new ResourceNotFoundException("Recipient not found in your gym");
+            log.error("Tenant mismatch! Sender tenant: {}, Recipient tenant: {}", sender.getTenantId(), recipient.getTenantId());
+            throw new BadRequestException("Cross-tenant messaging is not allowed");
         }
 
         ChatMessage message = new ChatMessage();
         message.setSender(sender);
         message.setRecipient(recipient);
         message.setMessage(request.getMessage());
-        
+        message.setRead(false);
+        message.setTenantId(sender.getTenantId());
+
         ChatMessage saved = chatRepository.save(message);
 
         // Trigger push notification
