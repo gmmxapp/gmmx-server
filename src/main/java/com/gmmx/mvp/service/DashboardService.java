@@ -2,9 +2,12 @@ package com.gmmx.mvp.service;
 
 import com.gmmx.mvp.core.tenant.TenantContext;
 import com.gmmx.mvp.dto.DashboardDtos;
-import com.gmmx.mvp.entity.UserAccount;
-import com.gmmx.mvp.entity.UserRole;
+import com.gmmx.mvp.entity.Attendance;
+import com.gmmx.mvp.entity.MemberProfile;
+import com.gmmx.mvp.entity.TrainerProfile;
+import com.gmmx.mvp.repository.AttendanceRepository;
 import com.gmmx.mvp.repository.MemberProfileRepository;
+import com.gmmx.mvp.repository.TrainerProfileRepository;
 import com.gmmx.mvp.repository.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +28,8 @@ public class DashboardService {
 
     private final UserAccountRepository userAccountRepository;
     private final MemberProfileRepository memberProfileRepository;
+    private final AttendanceRepository attendanceRepository;
+    private final TrainerProfileRepository trainerProfileRepository;
 
     public DashboardDtos.OwnerStatsResponse getOwnerStats() {
         UUID tenantId = TenantContext.getTenantId();
@@ -125,6 +130,53 @@ public class DashboardService {
         }
 
         return activities;
+    }
+
+    public DashboardDtos.ClientStatsResponse getClientStats(UserAccount currentUser) {
+        MemberProfile profile = memberProfileRepository.findByUserId(currentUser.getId())
+                .orElseThrow(() -> new RuntimeException("Member profile not found"));
+
+        List<Attendance> attendanceHistory = attendanceRepository.findByMemberIdOrderByDateDesc(profile.getId());
+        int totalVisits = attendanceHistory.size();
+
+        // Calculate attendance streak (last 7 days)
+        List<DashboardDtos.AttendanceDayResponse> streak = new ArrayList<>();
+        LocalDate now = LocalDate.now();
+        for (int i = 6; i >= 0; i--) {
+            LocalDate date = now.minusDays(i);
+            boolean present = attendanceHistory.stream().anyMatch(a -> a.getDate().equals(date));
+            streak.add(DashboardDtos.AttendanceDayResponse.builder()
+                    .day(date.getDayOfWeek().name().substring(0, 3))
+                    .present(present)
+                    .build());
+        }
+
+        TrainerProfile trainer = profile.getAssignedTrainer();
+        String trainerId = trainer != null ? trainer.getUser().getId().toString() : null;
+        String trainerName = trainer != null ? trainer.getUser().getFullName() : "No Trainer Assigned";
+        String trainerSpecialty = "Personal Coach"; // Fallback
+
+        // Mock workout for now (linked to future module)
+        List<DashboardDtos.ExerciseResponse> todayWorkout = new ArrayList<>();
+        todayWorkout.add(DashboardDtos.ExerciseResponse.builder().name("Bench Press").sets("4×12").icon("fitness_center").build());
+        todayWorkout.add(DashboardDtos.ExerciseResponse.builder().name("Incline Dumbbell").sets("3×15").icon("fitness_center").build());
+        todayWorkout.add(DashboardDtos.ExerciseResponse.builder().name("Tricep Pushdown").sets("4×15").icon("fitness_center").build());
+
+        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("MMM dd, yyyy");
+
+        return DashboardDtos.ClientStatsResponse.builder()
+                .planName(profile.getMembershipPlan() != null ? profile.getMembershipPlan().getName() : "Standard")
+                .expiryDate(profile.getExpiryDate() != null ? profile.getExpiryDate().format(formatter) : "N/A")
+                .totalVisits(totalVisits)
+                .calories(420) // Simulated for now
+                .todayWorkout(todayWorkout)
+                .trainerId(trainerId)
+                .trainerName(trainerName)
+                .trainerSpecialty(trainerSpecialty)
+                .attendanceStreak(streak)
+                .steps(6500) // Simulated
+                .stepGoal(10000) // Simulated
+                .build();
     }
 
     private String formatTimeAgo(LocalDateTime dateTime) {

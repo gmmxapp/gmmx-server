@@ -1,7 +1,9 @@
 package com.gmmx.mvp.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -36,6 +38,8 @@ public class DashboardDtos {
 
     @Data
     @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class OwnerStatsResponse {
         private String totalMembers;
         private String activeTrainers;
@@ -43,6 +47,43 @@ public class DashboardDtos {
         private String newMembersThisMonth;
         private List<DailyRevenue> weeklyRevenue;
         private String totalWeeklyRevenue;
+    }
+
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ClientStatsResponse {
+        private String planName;
+        private String expiryDate;
+        private int totalVisits;
+        private int calories;
+        private List<ExerciseResponse> todayWorkout;
+        private String trainerId; // Added
+        private String trainerName;
+        private String trainerSpecialty;
+        private List<AttendanceDayResponse> attendanceStreak;
+        private int steps;
+        private int stepGoal;
+    }
+
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ExerciseResponse {
+        private String name;
+        private String sets;
+        private String icon;
+    }
+
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class AttendanceDayResponse {
+        private String day;
+        private boolean present;
     }
 
     @Data
