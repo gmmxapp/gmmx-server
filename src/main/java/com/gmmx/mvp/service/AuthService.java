@@ -12,6 +12,7 @@ import com.gmmx.mvp.repository.TenantRepository;
 import com.gmmx.mvp.repository.UserAccountRepository;
 import com.gmmx.mvp.security.jwt.JwtUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,6 +23,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
     // Service for authentication
 
