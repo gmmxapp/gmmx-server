@@ -52,4 +52,13 @@ public class TrainerController {
     public ApiResponse<Page<TrainerDtos.TrainerResponse>> getAll(Pageable pageable) {
         return ApiResponse.success(trainerService.getAllTrainers(pageable), "Trainers retrieved successfully");
     }
+
+    @PutMapping("/{id}/permissions")
+    @PreAuthorize("hasAnyRole('OWNER', 'SUPER_ADMIN')")
+    @Operation(summary = "Update Trainer Permissions", description = "Owner grants or revokes specific permissions for a trainer.")
+    public ApiResponse<TrainerDtos.TrainerResponse> updatePermissions(
+            @PathVariable UUID id,
+            @RequestBody TrainerDtos.PermissionsUpdateRequest request) {
+        return ApiResponse.success(trainerService.updateTrainerPermissions(id, request), "Trainer permissions updated");
+    }
 }

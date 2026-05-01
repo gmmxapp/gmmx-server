@@ -11,6 +11,9 @@ public class PhoneUtils {
             return normalized;
         }
 
+        // Strip everything except digits for phone numbers
+        normalized = normalized.replaceAll("[^\\d+]", "");
+
         // Handle Indian mobile numbers
         if (normalized.startsWith("+91")) {
             normalized = normalized.substring(3);

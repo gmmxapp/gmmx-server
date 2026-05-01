@@ -22,6 +22,12 @@ public class TrainerDtos {
         private String email;
         private String mobile;
         private Boolean active;
+        private String permissions; // Comma-separated
+    }
+
+    @Data
+    public static class PermissionsUpdateRequest {
+        private java.util.List<String> permissions; // List of permission strings
     }
 
     @Data
@@ -31,5 +37,6 @@ public class TrainerDtos {
         private String email;
         private String mobile;
         private boolean active;
+        private String permissions;
     }
 }

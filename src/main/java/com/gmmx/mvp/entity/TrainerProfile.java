@@ -22,4 +22,12 @@ public class TrainerProfile extends BaseEntity {
 
     @Column(columnDefinition = "jsonb")
     private String availability;
+
+    /**
+     * Comma-separated list of permissions granted by the gym owner.
+     * Possible values: manage_leads, manage_attendance, admin_access, manager_access, trainer_only
+     * Example: "manage_leads,manage_attendance"
+     */
+    @Column(name = "permissions", columnDefinition = "TEXT", nullable = false)
+    private String permissions = "";
 }

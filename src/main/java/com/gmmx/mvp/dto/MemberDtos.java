@@ -15,6 +15,7 @@ public class MemberDtos {
         @NotBlank
         private String email;
         private String mobile;
+        private String countryCode;
         private Double height;
         private Double weight;
         private String medicalHistory;

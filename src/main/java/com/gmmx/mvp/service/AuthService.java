@@ -100,11 +100,17 @@ public class AuthService {
         // First try finding user in the specific tenant
         UserAccount user = userAccountRepository.findByEmailOrMobileNumberAndTenantId(identifier, identifier, tenant.getId())
                 .orElseGet(() -> {
-                    // If not found, check if it's a Super Admin from the 'admin' tenant
-                    // This allows Super Admins to log into the mobile app as well
-                    return userAccountRepository.findByEmailOrMobileNumber(identifier, identifier)
-                            .filter(u -> u.getRole() == UserRole.SUPER_ADMIN)
-                            .orElseThrow(() -> new RuntimeException("User not found in this gym."));
+                    // If not found, check globally to see if this user belongs to another gym
+                    UserAccount globalUser = userAccountRepository.findByEmailOrMobileNumber(identifier, identifier)
+                            .orElseThrow(() -> new RuntimeException("User not found in this system. Check your credentials."));
+                    
+                    // Allow Owners and Trainers to log into their correct tenant even if they started from the wrong gym ID
+                    if (globalUser.getRole() == UserRole.OWNER || globalUser.getRole() == UserRole.TRAINER || globalUser.getRole() == UserRole.SUPER_ADMIN) {
+                        return globalUser;
+                    }
+                    
+                    // For members, we are stricter to prevent accidental cross-tenant access if they share identifiers
+                    throw new RuntimeException("This account belongs to another gym. Please enter your correct Gym ID.");
                 });
 
         // 4. Brute force check

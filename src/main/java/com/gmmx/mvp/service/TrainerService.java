@@ -1,8 +1,10 @@
 package com.gmmx.mvp.service;
 
 import com.gmmx.mvp.dto.TrainerDtos;
+import com.gmmx.mvp.entity.TrainerProfile;
 import com.gmmx.mvp.entity.UserAccount;
 import com.gmmx.mvp.entity.UserRole;
+import com.gmmx.mvp.repository.TrainerProfileRepository;
 import com.gmmx.mvp.repository.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,6 +20,7 @@ import java.util.UUID;
 public class TrainerService {
 
     private final UserAccountRepository userAccountRepository;
+    private final TrainerProfileRepository trainerProfileRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
@@ -44,9 +47,17 @@ public class TrainerService {
         trainer.setPasswordHash(passwordEncoder.encode(initialPin));
         
         // Ensure tenantId is set from context
-        trainer.setTenantId(com.gmmx.mvp.core.tenant.TenantContext.getTenantId());
+        UUID tenantId = com.gmmx.mvp.core.tenant.TenantContext.getTenantId();
+        trainer.setTenantId(tenantId);
         
         trainer = userAccountRepository.save(trainer);
+        
+        // Create TrainerProfile so trainer can be assigned to members
+        TrainerProfile profile = new TrainerProfile();
+        profile.setUser(trainer);
+        profile.setTenantId(tenantId);
+        trainerProfileRepository.save(profile);
+        
         return mapToResponse(trainer);
     }
 
@@ -70,6 +81,8 @@ public class TrainerService {
         UserAccount trainer = userAccountRepository.findById(id)
                 .filter(u -> u.getRole() == UserRole.TRAINER)
                 .orElseThrow(() -> new RuntimeException("Trainer not found"));
+        // Also delete their TrainerProfile
+        trainerProfileRepository.findByUserId(id).ifPresent(trainerProfileRepository::delete);
         userAccountRepository.delete(trainer);
     }
 
@@ -79,13 +92,41 @@ public class TrainerService {
                 .map(this::mapToResponse);
     }
 
+    @Transactional
+    public TrainerDtos.TrainerResponse updateTrainerPermissions(UUID trainerId, TrainerDtos.PermissionsUpdateRequest request) {
+        // trainerId here is UserAccount.id
+        TrainerProfile profile = trainerProfileRepository.findByUserId(trainerId)
+                .orElseGet(() -> {
+                    // Create profile if it doesn't exist (for trainers added before this fix)
+                    UserAccount trainer = userAccountRepository.findById(trainerId)
+                            .orElseThrow(() -> new RuntimeException("Trainer not found"));
+                    TrainerProfile newProfile = new TrainerProfile();
+                    newProfile.setUser(trainer);
+                    newProfile.setTenantId(com.gmmx.mvp.core.tenant.TenantContext.getTenantId());
+                    return trainerProfileRepository.save(newProfile);
+                });
+
+        String permissionsStr = request.getPermissions() != null
+                ? String.join(",", request.getPermissions())
+                : "";
+        profile.setPermissions(permissionsStr);
+        trainerProfileRepository.save(profile);
+        return mapToResponse(profile.getUser());
+    }
+
     private TrainerDtos.TrainerResponse mapToResponse(UserAccount account) {
         TrainerDtos.TrainerResponse response = new TrainerDtos.TrainerResponse();
+        // Use UserAccount.id so frontend can pass it as assignedTrainerId
+        // MemberService.findByUserId will resolve to TrainerProfile
         response.setId(account.getId());
         response.setFullName(account.getFullName());
         response.setEmail(account.getEmail());
         response.setMobile(account.getMobile());
         response.setActive(account.isEnabled());
+        // Populate permissions from TrainerProfile
+        trainerProfileRepository.findByUserId(account.getId()).ifPresent(profile ->
+            response.setPermissions(profile.getPermissions())
+        );
         return response;
     }
 }

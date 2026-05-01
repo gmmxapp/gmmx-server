@@ -41,9 +41,17 @@ public class MemberService {
         UserAccount user = new UserAccount();
         user.setEmail(request.getEmail());
         user.setFullName(request.getFullName());
-        user.setMobile(com.gmmx.mvp.util.PhoneUtils.normalizeIdentifier(request.getMobile()));
+        // Store mobile with country code for login matching
+        String normalizedMobile = com.gmmx.mvp.util.PhoneUtils.normalizeIdentifier(request.getMobile());
+        user.setMobile(normalizedMobile);
+        if (request.getCountryCode() != null) {
+            user.setCountryCode(request.getCountryCode());
+        }
         user.setRole(UserRole.MEMBER);
-        user.setPasswordHash(passwordEncoder.encode(generateTemporaryPassword()));
+        // Default PIN is 1234 — member can change it later in their profile
+        user.setPasswordHash(passwordEncoder.encode("1234"));
+        // Set tenant from context so member belongs to this gym
+        user.setTenantId(com.gmmx.mvp.core.tenant.TenantContext.getTenantId());
         user = userAccountRepository.save(user);
 
         // 2. Create MemberProfile
