@@ -29,41 +29,44 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         
-        final String authHeader = request.getHeader("Authorization");
-        final String jwt;
-        final String userEmail;
+        try {
+            final String authHeader = request.getHeader("Authorization");
+            final String jwt;
+            final String userEmail;
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                jwt = authHeader.substring(7);
+                userEmail = jwtUtils.extractUsername(jwt);
+                UUID tenantIdFromToken = jwtUtils.extractTenantId(jwt);
 
-        jwt = authHeader.substring(7);
-        userEmail = jwtUtils.extractUsername(jwt);
-        UUID tenantIdFromToken = jwtUtils.extractTenantId(jwt);
+                // Always set TenantContext if we have a tenantId in the token
+                if (tenantIdFromToken != null) {
+                    TenantContext.setTenantId(tenantIdFromToken);
+                }
 
-        // Always set TenantContext if we have a tenantId in the token
-        if (tenantIdFromToken != null) {
-            TenantContext.setTenantId(tenantIdFromToken);
-        }
+                if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    java.util.Optional<com.gmmx.mvp.entity.UserAccount> userOpt = tenantIdFromToken != null 
+                        ? userAccountRepository.findByEmailAndTenantId(userEmail, tenantIdFromToken)
+                        : userAccountRepository.findByEmail(userEmail);
 
-        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            java.util.Optional<com.gmmx.mvp.entity.UserAccount> userOpt = tenantIdFromToken != null 
-                ? userAccountRepository.findByEmailAndTenantId(userEmail, tenantIdFromToken)
-                : userAccountRepository.findByEmail(userEmail);
-
-            if (userOpt.isPresent()) {
-                UserDetails userDetails = userOpt.get();
-                if (jwtUtils.isTokenValid(jwt, userDetails)) {
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            userDetails, null, userDetails.getAuthorities()
-                    );
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                    if (userOpt.isPresent()) {
+                        UserDetails userDetails = userOpt.get();
+                        if (jwtUtils.isTokenValid(jwt, userDetails)) {
+                            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                                    userDetails, null, userDetails.getAuthorities()
+                            );
+                            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                            SecurityContextHolder.getContext().setAuthentication(authToken);
+                        }
+                    }
                 }
             }
+        } catch (Exception e) {
+            // Log exception and continue - let security config decide if request is allowed
+            logger.error("Error processing JWT: " + e.getMessage());
+        } finally {
+            filterChain.doFilter(request, response);
+            TenantContext.clear();
         }
-        
-        filterChain.doFilter(request, response);
     }
 }

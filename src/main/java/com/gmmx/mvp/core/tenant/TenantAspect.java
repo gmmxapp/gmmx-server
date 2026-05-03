@@ -26,8 +26,16 @@ public class TenantAspect {
                 return;
             }
 
-            Session session = entityManager.unwrap(Session.class);
-            session.enableFilter("tenantFilter").setParameter("tenantId", tenantId);
+            if (entityManager != null) {
+                try {
+                    Session session = entityManager.unwrap(Session.class);
+                    if (session != null && session.isOpen()) {
+                        session.enableFilter("tenantFilter").setParameter("tenantId", tenantId);
+                    }
+                } catch (Exception e) {
+                    // Ignore if session cannot be unwrapped or filter cannot be enabled
+                }
+            }
         }
     }
 }
