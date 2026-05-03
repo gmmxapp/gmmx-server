@@ -40,4 +40,18 @@ public class TenantController {
         boolean exists = tenantRepository.existsBySubdomain(slug);
         return ApiResponse.success(!exists, exists ? "Slug already taken" : "Slug available");
     }
+
+    @GetMapping("/me")
+    public ApiResponse<Object> getMe() {
+        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) {
+            return ApiResponse.error("Not authenticated");
+        }
+        java.util.Map<String, Object> details = new java.util.HashMap<>();
+        details.put("username", auth.getName());
+        details.put("authorities", auth.getAuthorities().stream()
+                .map(org.springframework.security.core.GrantedAuthority::getAuthority)
+                .collect(java.util.stream.Collectors.toList()));
+        return ApiResponse.success(details, "User details retrieved");
+    }
 }
