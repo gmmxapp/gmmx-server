@@ -15,8 +15,8 @@ RUN apk add --no-cache curl
 
 COPY --from=builder /app/target/gmmx-backend-1.0.0.jar app.jar
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
-  CMD curl -f http://localhost:8080/actuator/health || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD curl -f http://127.0.0.1:8080/actuator/health || exit 1
 
 # Add a non-root user for security
 RUN addgroup -S spring && adduser -S spring -G spring
