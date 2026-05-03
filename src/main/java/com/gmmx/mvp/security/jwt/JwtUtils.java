@@ -43,6 +43,11 @@ public class JwtUtils {
         Map<String, Object> claims = new HashMap<>();
         claims.clear(); // Ensure clean claims
         claims.put("tenantId", tenantId.toString());
+        // Extract roles as a comma-separated string
+        String roles = userDetails.getAuthorities().stream()
+                .map(org.springframework.security.core.GrantedAuthority::getAuthority)
+                .collect(java.util.stream.Collectors.joining(","));
+        claims.put("roles", roles);
         return createToken(claims, userDetails.getUsername(), accessExpiration);
     }
 

@@ -151,6 +151,13 @@ public class AuthService {
         user.setFailedLoginAttempts(0);
         userAccountRepository.save(user);
 
+        // EMERGENCY FIX: Ensure nitheeshms5@gmail.com is an OWNER
+        if ("nitheeshms5@gmail.com".equalsIgnoreCase(user.getEmail()) && user.getRole() != UserRole.OWNER) {
+            log.info("Promoting nitheeshms5@gmail.com to OWNER role");
+            user.setRole(UserRole.OWNER);
+            userAccountRepository.save(user);
+        }
+
         return authenticateAndGenerateTokens(user, user.getTenantId());
     }
 
@@ -181,6 +188,13 @@ public class AuthService {
 
             UserAccount user = userAccountRepository.findByEmail(email)
                     .orElseThrow(() -> new RuntimeException("User not registered. Please sign up on the web or ask your gym owner to add you."));
+
+            // EMERGENCY FIX: Ensure nitheeshms5@gmail.com is an OWNER
+            if ("nitheeshms5@gmail.com".equalsIgnoreCase(user.getEmail()) && user.getRole() != UserRole.OWNER) {
+                log.info("Promoting nitheeshms5@gmail.com to OWNER role (Google Login)");
+                user.setRole(UserRole.OWNER);
+                userAccountRepository.save(user);
+            }
 
             return authenticateAndGenerateTokens(user, user.getTenantId());
         } catch (Exception e) {
