@@ -30,6 +30,10 @@ public class TenantController {
                 .hasMicrosite(tenant.isHasMicrosite())
                 .about(tenant.getAbout())
                 .themePrimary(tenant.getThemePrimary() != null ? tenant.getThemePrimary() : "#ef4444")
+                .attendanceMode(tenant.getAttendanceMode() != null ? tenant.getAttendanceMode().name() : "MANUAL")
+                .latitude(tenant.getLatitude())
+                .longitude(tenant.getLongitude())
+                .attendanceRadius(tenant.getAttendanceRadius())
                 .build();
 
         return ApiResponse.success(response, "Gym found");

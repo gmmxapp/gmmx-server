@@ -20,5 +20,9 @@ public class TenantDtos {
         private boolean hasMicrosite;
         private String about;
         private String themePrimary;
+        private String attendanceMode;
+        private Double latitude;
+        private Double longitude;
+        private Double attendanceRadius;
     }
 }

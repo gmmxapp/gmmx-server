@@ -12,7 +12,10 @@ public class AttendanceDtos {
     public static class AttendanceMarkRequest {
         @NotNull
         private UUID memberId;
-        private String method = "MANUAL"; // MANUAL, QR, BIOMETRIC
+        private String method = "MANUAL"; // MANUAL, QR, LOCATION, HYBRID
+        private Double latitude;
+        private Double longitude;
+        private String qrToken;
     }
 
     @Data

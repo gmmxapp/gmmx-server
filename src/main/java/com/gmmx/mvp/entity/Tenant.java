@@ -53,6 +53,19 @@ public class Tenant {
     private String about;
     private String themePrimary = "#ef4444"; // Default red-500
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "attendance_mode")
+    private AttendanceMode attendanceMode = AttendanceMode.MANUAL;
+
+    private Double latitude;
+    private Double longitude;
+
+    @Column(name = "attendance_radius")
+    private Double attendanceRadius = 500.0; // In meters
+
+    @Column(name = "qr_secret")
+    private String qrSecret;
+
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
